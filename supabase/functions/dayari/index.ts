@@ -487,12 +487,14 @@ async function doPost(input: any, userId: string, ip: string, ipHash: string | n
   const blocked = await gate(userId, ipHash, 'post', deps, origin);
   if (blocked) return blocked;
 
+  // Even a refused post still gets the hotline note if it mentions suicide or self-harm.
+  const crisisWords = detectCrisis(text);
   const pii = findPersonalInfo(text);
-  if (pii) return reject('pii_' + pii.kind, { code: 'pii', kind: pii.kind }, deps, origin);
+  if (pii) return reject('pii_' + pii.kind, { code: 'pii', kind: pii.kind, crisis: crisisWords }, deps, origin);
 
   const verdict = await moderate(text, deps);
-  const crisis = detectCrisis(text) || verdict.selfHarm;
-  if (verdict.decision === 'reject') return reject('moderation', { code: 'moderation' }, deps, origin);
+  const crisis = crisisWords || verdict.selfHarm;
+  if (verdict.decision === 'reject') return reject('moderation', { code: 'moderation', crisis }, deps, origin);
 
   const held = verdict.decision === 'hold';
   const reasons: string[] = [];

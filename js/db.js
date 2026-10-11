@@ -58,6 +58,7 @@
       throw err;
     });
   }
+  M.lockWithTimeout = lockWithTimeout;   // also used by Dayari Mo's anonymous account (js/dayari.js)
 
   // ---------- safety nets ----------
 

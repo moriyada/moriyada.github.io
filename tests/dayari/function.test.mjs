@@ -171,7 +171,7 @@ for (const [kind, samples] of Object.entries(PII)) {
       const w = world();
       const r = await call(w, post(text));
       assert.equal(r.status, 422, text);
-      assert.deepEqual(r.body, { ok: false, code: 'pii', kind }, text);
+      assert.deepEqual(r.body, { ok: false, code: 'pii', kind, crisis: false }, text);
       assert.equal(rpcs(w, 'dayari_insert_post').length, 0, 'not saved: ' + text);
       assert.deepEqual(rpcs(w, 'dayari_log_rejection')[0].args, { p_reason: 'pii_' + kind });
       assert.ok(!JSON.stringify(w.calls).includes(text.slice(0, 12)) || kind === 'x', 'the text is not logged');
@@ -201,6 +201,12 @@ test('crisis words are NOT blocked: published, flagged, hotline shown', async ()
     assert.equal(ins.p_crisis, true);
     assert.deepEqual(ins.p_reasons, ['crisis']);
   }
+});
+
+test('a refused post that mentions self-harm still gets the hotline note', async () => {
+  const r = await call(world(), post('Gusto ko nang mamatay. Text me 0917 123 4567'));
+  assert.equal(r.body.code, 'pii');
+  assert.equal(r.body.crisis, true);
 });
 
 test('OpenAI self-harm categories also count as crisis, never rejected', async () => {

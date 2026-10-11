@@ -1,0 +1,240 @@
+/* Dayari Mo (the public, anonymous diary) and its /admin page.
+   Loaded after style.css: same colors, header, ribbon and theme button (the Moriyada
+   identity), but a more modern, readable layer on top: bigger sans-serif text, more
+   spacing, clear rounded buttons, visible focus rings. Mobile first. */
+
+body.dayari {
+  --dy-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --dy-surface: #f6f6fc;
+  --dy-border: #c9c9e6;
+  --dy-accent: var(--navy);
+  --dy-on-accent: #ffffff;
+  --dy-focus: #1a5fff;
+  --dy-danger: #a40000;
+  --dy-ok: #0b6b2e;
+  --dy-warn-bg: #fff7e0;
+  --dy-warn-border: #c99a00;
+  --dy-radius: 10px;
+  font-family: var(--dy-font);
+  font-size: 18px;
+  line-height: 1.6;
+}
+:root[data-theme="dark"] body.dayari {
+  --dy-surface: #161629;
+  --dy-border: #34345c;
+  --dy-on-accent: #0d0d1a;
+  --dy-focus: #8ab4ff;
+  --dy-danger: #ff8a8a;
+  --dy-ok: #7fe0a0;
+  --dy-warn-bg: #2a2410;
+  --dy-warn-border: #b58f22;
+}
+
+body.dayari #page { max-width: 720px; }
+
+/* Keep the Moriyada header, a little calmer */
+body.dayari #top h1 { font-size: 40px; }
+body.dayari #top .subtitle { font-size: 17px; color: var(--muted); }
+body.dayari #theme-toggle { width: 44px; height: 40px; border-radius: 8px; }
+body.dayari #ribbon { font-family: var(--font-body); }
+
+body.dayari h2 {
+  font-size: 26px;
+  margin: 28px 0 8px;
+  line-height: 1.25;
+}
+body.dayari h3 { font-size: 20px; margin: 18px 0 6px; }
+body.dayari p { margin: 0 0 12px; }
+body.dayari .lead { font-size: 19px; }
+body.dayari .small, body.dayari .hint { font-size: 15px; color: var(--muted); }
+body.dayari footer { font-size: 15px; font-family: var(--dy-font); }
+body.dayari footer a { margin: 0 8px; }
+
+/* Focus is always visible, for keyboard users */
+body.dayari a:focus-visible,
+body.dayari button:focus-visible,
+body.dayari textarea:focus-visible,
+body.dayari input:focus-visible,
+body.dayari summary:focus-visible {
+  outline: 3px solid var(--dy-focus);
+  outline-offset: 2px;
+}
+
+/* ---------- buttons ---------- */
+
+body.dayari button, body.dayari .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 18px;
+  font-family: var(--dy-font);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.2;
+  border-radius: 999px;
+  border: 2px solid var(--dy-accent);
+  background: transparent;
+  color: var(--dy-accent);
+  text-decoration: none;
+  cursor: pointer;
+}
+body.dayari button.primary { background: var(--dy-accent); color: var(--dy-on-accent); }
+body.dayari button.danger { border-color: var(--dy-danger); color: var(--dy-danger); }
+body.dayari button.quiet {
+  min-height: 40px;
+  padding: 6px 12px;
+  border-color: transparent;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--muted);
+}
+body.dayari button.quiet:hover { color: var(--dy-accent); border-color: var(--dy-border); }
+body.dayari button:disabled { opacity: 0.55; cursor: wait; }
+body.dayari #theme-toggle { min-height: 0; padding: 0; font-weight: normal; }
+body.dayari .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
+
+/* ---------- panels and forms ---------- */
+
+.dy-panel {
+  background: var(--dy-surface);
+  border: 1px solid var(--dy-border);
+  border-radius: var(--dy-radius);
+  padding: 18px;
+  margin: 14px 0;
+}
+.dy-panel > :first-child { margin-top: 0; }
+.dy-panel > :last-child { margin-bottom: 0; }
+
+body.dayari textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 180px;
+  padding: 12px 14px;
+  font-family: var(--dy-font);
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--dy-border);
+  border-radius: var(--dy-radius);
+}
+body.dayari textarea:focus { border-color: var(--dy-accent); }
+body.dayari label.field-label { display: block; font-weight: 600; margin-bottom: 6px; }
+
+.dy-count { font-size: 14px; color: var(--muted); text-align: right; margin-top: 4px; }
+.dy-count.over { color: var(--dy-danger); font-weight: 600; }
+
+.dy-check {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin: 10px 0;
+  cursor: pointer;
+}
+.dy-check input { width: 22px; height: 22px; margin: 3px 0 0; flex: none; accent-color: var(--dy-accent); }
+
+.dy-captcha:empty { display: none; }
+.dy-captcha { margin-top: 12px; }
+
+/* status messages */
+.dy-msg {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border-radius: var(--dy-radius);
+  border: 1px solid var(--dy-border);
+  background: var(--bg);
+}
+.dy-msg:empty { display: none; }
+.dy-msg.ok { border-color: var(--dy-ok); }
+.dy-msg.error { border-color: var(--dy-danger); color: var(--text); }
+.dy-msg.error strong { color: var(--dy-danger); }
+
+/* the gentle crisis note */
+.dy-care {
+  margin: 16px 0;
+  padding: 16px 18px;
+  border-radius: var(--dy-radius);
+  background: var(--dy-warn-bg);
+  border: 1px solid var(--dy-warn-border);
+}
+.dy-care h3 { margin-top: 0; color: var(--text); font-family: var(--dy-font); font-size: 19px; }
+.dy-care .lines { font-size: 20px; font-weight: 700; }
+.dy-care .lines a { color: var(--text); }
+
+/* ---------- posts ---------- */
+
+.dy-posts { list-style: none; margin: 0; padding: 0; }
+.dy-post {
+  padding: 16px 0 12px;
+  border-bottom: 1px solid var(--dy-border);
+}
+.dy-post:last-child { border-bottom: 0; }
+.dy-post .when { font-size: 14px; color: var(--muted); margin-bottom: 4px; }
+.dy-post .body { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
+.dy-post .tools { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; }
+.dy-post .yours { font-size: 14px; color: var(--dy-accent); font-weight: 600; }
+.dy-post .report-form { margin-top: 8px; }
+.dy-post .report-form fieldset { border: 1px solid var(--dy-border); border-radius: var(--dy-radius); padding: 10px 14px; margin: 0; }
+.dy-post .report-form legend { font-weight: 600; padding: 0 4px; }
+.dy-post .note { font-size: 15px; font-family: var(--dy-font); color: var(--muted); margin-top: 6px; }
+
+.dy-badge {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--dy-border);
+  color: var(--muted);
+  margin-right: 6px;
+}
+.dy-badge.held, .dy-badge.reports { border-color: var(--dy-warn-border); color: var(--text); background: var(--dy-warn-bg); }
+.dy-badge.hidden, .dy-badge.danger { border-color: var(--dy-danger); color: var(--dy-danger); }
+.dy-badge.crisis { border-color: var(--dy-warn-border); background: var(--dy-warn-bg); color: var(--text); }
+.dy-badge.published { border-color: var(--dy-ok); color: var(--dy-ok); }
+
+.dy-empty { color: var(--muted); font-style: italic; }
+
+/* ---------- reading pages (privacy, rules) ---------- */
+
+.dy-doc h2 { font-size: 23px; }
+.dy-doc li { margin-bottom: 8px; }
+.dy-doc .updated { font-size: 15px; color: var(--muted); }
+
+/* ---------- admin ---------- */
+
+.dy-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+}
+.dy-stat {
+  background: var(--dy-surface);
+  border: 1px solid var(--dy-border);
+  border-radius: var(--dy-radius);
+  padding: 10px 12px;
+}
+.dy-stat .n { display: block; font-size: 26px; font-weight: 700; color: var(--dy-accent); line-height: 1.2; }
+.dy-stat .label { font-size: 14px; color: var(--muted); }
+
+.dy-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.dy-tabs button[aria-pressed="true"] { background: var(--dy-accent); color: var(--dy-on-accent); }
+.dy-admin-post .meta-line { font-size: 14px; color: var(--muted); }
+.dy-admin-post .why { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+@media (min-width: 640px) {
+  .dy-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .dy-panel { padding: 22px 24px; }
+}
+
+@media (max-width: 640px) {
+  body.dayari { font-size: 17px; }
+  body.dayari #top h1 { font-size: 34px; }
+  body.dayari h2 { font-size: 23px; }
+  body.dayari .actions button { flex: 1 1 auto; }
+}

@@ -13,7 +13,8 @@
     { label: 'quotes', path: 'html/quotes.html', ready: true },
     { label: 'goals', path: 'html/goals.html', ready: true },
     { label: 'places', path: 'html/places.html' },
-    { label: 'about', path: 'html/about.html', ready: true }
+    { label: 'about', path: 'html/about.html', ready: true },
+    { label: 'dayari mo', path: 'dayari/index.html', ready: true }
   ];
   // Easter egg: the title read backward by syllable. mo-ri-ya-da -> da-ya-ri mo, "your diary".
   // Hover shows it (CSS, from data-egg). On touch screens the first tap shows it instead of
