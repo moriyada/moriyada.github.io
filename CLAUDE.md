@@ -242,8 +242,8 @@ Claude; wait for his review before starting the next phase.**
 - The private ID (`author_id`) is **never readable through the API** (column-level grants),
   never shown anywhere. Admin shows only a 6-character tag (`left(md5(id), 6)`).
 - Anonymous sign-in needs "Allow new users to sign up" ON. The Auth hook
-  `dayari_before_user_created` (sql/006) then refuses any non-anonymous sign-up, so nobody
-  can make an email account. Supabase Auth's own CAPTCHA setting stays OFF (it would also
+  `dayari_before_user_created` (sql/006) then refuses any sign-up that has an email or phone,
+  so nobody can make a real account. Supabase Auth's own CAPTCHA setting stays OFF (it would also
   demand a CAPTCHA on his own password login); Turnstile is checked in the Edge Function.
 
 ### Writes: only through the `dayari` Edge Function
@@ -298,6 +298,13 @@ Claude; wait for his review before starting the next phase.**
   days + hides all their posts), lift ban. Stats: today's posts/writers, queue sizes,
   reports, rejections by reason.
 
+### Setup and deploying
+- His one-time steps (SQL, hook, sign-in switches, Turnstile, secrets, pasting the function in
+  the dashboard editor) are in README "Dayari Mo setup". Any PR that changes
+  `supabase/functions/dayari/index.ts` must tell him to paste and deploy it again.
+- `supabase/` and `tests/` are served by GitHub Pages like everything else: never put
+  anything secret there (there isn't any).
+
 ### Tests
 - `bash tests/dayari/run-sql-tests.sh`: a throwaway local Postgres with a small Supabase
   stand-in (`tests/dayari/supabase-stub.sql`), loads every `sql/` file twice, then checks
@@ -309,6 +316,6 @@ Claude; wait for his review before starting the next phase.**
 
 Done: 1 database, 2 home, 3 posting, 4 archive + day, favorites, hobbies, quotes,
 bookshelf, goals, about, song search, daily weather, favicon, 404. Random day: dropped.
-Left: [places] (still "soon"). Dayari Mo: phase A in progress (see above).
+Left: [places] (still "soon"). Dayari Mo: phase A in a PR, waiting for his review (B-F after).
 Later, not v1: weight graph, year-in-pixels mood grid, "changed my mind" log, letter to
 future self, RSS, search, places map.
