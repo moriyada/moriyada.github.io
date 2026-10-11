@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://*.supabase.co; frame-src 'none'; object-src 'none'; worker-src 'none'; manifest-src 'self'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <title>admin - Dayari Mo</title>
+  <link rel="preload" href="../fonts/im-fell-english-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preconnect" href="https://uxjsqgeynszqhkzzwvhd.supabase.co" crossorigin>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dayari.css">
+  <script defer src="../js/vendor/supabase-2.45.4.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o"></script>
+  <script defer src="../js/config.js"></script>
+  <script defer src="../js/db.js"></script>
+  <script defer src="../js/render.js"></script>
+  <script defer src="../js/ribbon.js"></script>
+  <script defer src="../js/dayari-admin.js"></script>
+  <script src="../js/theme.js"></script>
+</head>
+<body class="dayari" data-root="../" data-page="admin">
+<div id="page">
+
+  <header id="top">
+    <div id="top-right">
+      <button id="theme-toggle" type="button" aria-label="switch theme"></button>
+    </div>
+    <h1><a href="../dayari/index.html">Dayari Mo</a></h1>
+    <p class="subtitle">admin (owner only)</p>
+  </header>
+
+  <nav id="ribbon" aria-label="Moriyada"></nav>
+
+  <main id="content">
+    <p id="admin-gate" class="dy-msg" role="status">Checking your login...</p>
+
+    <div id="admin" hidden>
+      <section aria-labelledby="stats-title">
+        <h2 id="stats-title">Today</h2>
+        <div id="stats" class="dy-stats"></div>
+        <p id="rejected" class="small"></p>
+      </section>
+
+      <section aria-labelledby="posts-title">
+        <h2 id="posts-title">Posts</h2>
+        <div class="dy-tabs" role="group" aria-label="Which posts">
+          <button type="button" data-view="queue" aria-pressed="true">Needs review</button>
+          <button type="button" data-view="held" aria-pressed="false">Held</button>
+          <button type="button" data-view="reported" aria-pressed="false">Reported</button>
+          <button type="button" data-view="crisis" aria-pressed="false">Crisis</button>
+          <button type="button" data-view="hidden" aria-pressed="false">Hidden</button>
+          <button type="button" data-view="recent" aria-pressed="false">All recent</button>
+        </div>
+        <p id="admin-msg" class="dy-msg" role="status" aria-live="polite"></p>
+        <ul id="admin-list" class="dy-posts" aria-live="polite"></ul>
+      </section>
+
+      <section aria-labelledby="bans-title">
+        <h2 id="bans-title">Bans</h2>
+        <p class="small">Banning a writer blocks their anonymous account until you lift it, blocks their network for 30 days, and hides all their posts.</p>
+        <ul id="ban-list" class="dy-posts"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <a href="../dayari/index.html">dayari mo</a>
+    <a href="../html/post.html">post</a>
+    <a href="../index.html">moriyada</a>
+  </footer>
+
+</div>
+</body>
+</html>
