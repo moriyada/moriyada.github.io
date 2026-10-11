@@ -269,11 +269,15 @@ Claude; wait for his review before starting the next phase.**
   street, Blk/Lot, Purok, unit), social profile links/handles, and a full name in the same
   post as a school or workplace. Heuristic; reports + review catch the rest.
 - **Moderation**: OpenAI `omni-moderation-latest` (free) when `OPENAI_API_KEY` is set:
-  sexual/minors, threats (hate/threatening, harassment/threatening, violence >= 0.5) ->
-  rejected; other flagged hate/harassment/sexual/violence/illicit -> held for review;
-  unflagged but score >= 0.4 in those -> held. Missing key or OpenAI down -> built-in keyword
-  filter (English + Filipino): clear threats/slurs rejected, borderline held, posts reviewed
-  by the fallback get the review reason `fallback` only when held.
+  rejected = sexual/minors (any flag or score >= 0.2), threats (hate/threatening,
+  harassment/threatening, score >= 0.5), sexual >= 0.8, hate or harassment >= 0.9; held for
+  review = any other flag or score >= 0.4 in hate, harassment, sexual, violence(/graphic),
+  illicit(/violent). Violence is held, not rejected (people write about things done to
+  them). The keyword filter also runs; if it would reject what OpenAI allowed, the post is
+  held. No key or OpenAI down -> keyword filter only (English + Filipino, catches stretched
+  letters, l33t, spaced-out slurs): threats/slurs/sexual-minors rejected, insults aimed at
+  someone and sexual words held (review reasons `held` + `fallback`). Everyday swearing
+  ("putangina ang init") is fine.
 - **Crisis** (suicide/self-harm words in English/Filipino, or OpenAI self-harm categories):
   **never blocked**. Published normally, writer sees a gentle note with NCMH 1553 /
   0917-899-8727, post flagged `crisis` in the admin queue. Exception: OpenAI
