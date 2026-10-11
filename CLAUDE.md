@@ -213,10 +213,98 @@ README.md has the setup steps and the entry field reference; this file has the r
 - `media` holds storage paths (`YYYY/MM/DD/<random>.jpg`) or YouTube links. Videos are
   YouTube links only (embedded via youtube-nocookie).
 
+## Dayari Mo (the anonymous public diary, `/dayari/`)
+
+Asked 2026-10-11: open Moriyada to the public as "Dayari Mo", an anonymous daily diary.
+**The personal diary stays exactly as it is**: separate pages, tables, scripts and styles.
+Built in phases A-F (spec in the project thread), **one PR per phase, never merged by
+Claude; wait for his review before starting the next phase.**
+
+- **Free tier only, no paid services. Public posts are text-only.**
+- **Pages:** `/dayari/index.html` (write + read), `/dayari/privacy.html` (Data Privacy Act
+  notice, plain language), `/dayari/rules.html` (house rules / terms), `/admin/index.html`
+  (owner only). Ribbon item "dayari mo" (no brackets, like every ribbon item). Scripts:
+  `js/dayari.js` (shared: anonymous account, Turnstile, calling the Edge Function, texts),
+  `js/dayari-home.js`, `js/dayari-admin.js`. Styles: `css/dayari.css` on top of `style.css`.
+- **Look:** keeps the Moriyada identity (navy, IM Fell English headings, same ribbon and
+  theme button) but is more modern and accessible: system sans-serif body at 18px, 1.6 line
+  height, 44px+ tap targets, rounded buttons, visible focus rings, light + dark. The
+  "no modern card styling" rule is for the personal diary only.
+- **All interface text lives in one object (`T` in `js/dayari.js`)** so the Tagalog/English
+  toggle (phase E) only has to add a second set.
+
+### Accounts
+- Supabase **anonymous sign-ins**. The account is created lazily: only when someone posts,
+  reports or deletes, never just for reading (keeps the free-tier MAU count down).
+- The anonymous session is stored under its own key (`moriyada-dayari-auth`), never the
+  owner's `sb-<ref>-auth-token`, so it can't overwrite his login or make
+  `M.hasStoredSession()` true for visitors.
+- The private ID (`author_id`) is **never readable through the API** (column-level grants),
+  never shown anywhere. Admin shows only a 6-character tag (`left(md5(id), 6)`).
+- Anonymous sign-in needs "Allow new users to sign up" ON. The Auth hook
+  `dayari_before_user_created` (sql/006) then refuses any non-anonymous sign-up, so nobody
+  can make an email account. Supabase Auth's own CAPTCHA setting stays OFF (it would also
+  demand a CAPTCHA on his own password login); Turnstile is checked in the Edge Function.
+
+### Writes: only through the `dayari` Edge Function
+- RLS + revoked privileges: **nobody** (visitor, anonymous account, even the owner) can
+  insert/update/delete any `dayari_*` table through the API. Visitors can read published
+  posts, 4 columns only (`id, entry_date, body, created_at`; `select *` fails on purpose).
+- One function, `supabase/functions/dayari/index.ts`, one file, no imports (so he can paste
+  it into the dashboard editor), actions `post`, `report`, `delete`. It uses the service key
+  (provided by Supabase inside functions, never in the repo) to call service-only SQL
+  functions: `dayari_gate` (bans + rate limits), `dayari_insert_post`, `dayari_add_report`,
+  `dayari_delete_own`, `dayari_log_rejection`.
+- Post pipeline, in order: login check (must be an anonymous account) -> age 13+ and house
+  rules accepted -> length 1-2000 -> Turnstile -> ban + rate limit (per account and per
+  network) -> personal info -> crisis words -> moderation -> save.
+- **Rate limits** (sql/006 `dayari_gate`): posts 6/hour and 15/day per account, 20/hour and
+  60/day per network; reports 10/30 and 20/60; deletes 30/100 and 60/200. Phase B adds the
+  one-entry-per-day rule on top.
+- **Network address**: only a salted SHA-256 hash (`DAYARI_IP_SALT` secret, falls back to
+  the service key), used for rate limits, report de-duplication and 30-day network bans.
+  Wiped from posts after 30 days; rate counters deleted after 2 days.
+- **Personal info** blocked (kind message, nothing saved): PH/intl phone numbers (hotline
+  numbers allowed), emails (also "name at gmail dot com"), street addresses (house number +
+  street, Blk/Lot, Purok, unit), social profile links/handles, and a full name in the same
+  post as a school or workplace. Heuristic; reports + review catch the rest.
+- **Moderation**: OpenAI `omni-moderation-latest` (free) when `OPENAI_API_KEY` is set:
+  sexual/minors, threats (hate/threatening, harassment/threatening, violence >= 0.5) ->
+  rejected; other flagged hate/harassment/sexual/violence/illicit -> held for review;
+  unflagged but score >= 0.4 in those -> held. Missing key or OpenAI down -> built-in keyword
+  filter (English + Filipino): clear threats/slurs rejected, borderline held, posts reviewed
+  by the fallback get the review reason `fallback` only when held.
+- **Crisis** (suicide/self-harm words in English/Filipino, or OpenAI self-harm categories):
+  **never blocked**. Published normally, writer sees a gentle note with NCMH 1553 /
+  0917-899-8727, post flagged `crisis` in the admin queue. Exception: OpenAI
+  `self-harm/instructions` is held for review (writer still gets the note).
+- **Reports**: one per account and one per network per post; 3 reports -> hidden + queued.
+  Approving clears the reports.
+- **Rejected posts are never stored**; only a reason + day count (`dayari_rejections`).
+- **Turnstile** is the one outside script on the site, loaded only on `/dayari/` pages, only
+  when someone is about to write/report/delete (CSP adds `https://challenges.cloudflare.com`
+  to script-src and frame-src on dayari pages only). No SRI possible (Cloudflare updates it).
+  Missing secret on the server = posting closed (fails safe), never "skip the check".
+
+### Admin (`/admin/`)
+- Uses the owner's existing login from the posting page (`M.authClient()`); no new login.
+  Owner-only SQL functions (`dayari_admin_*`) check `is_owner()` (so 2-step applies).
+- Views: needs review, held, reported, crisis, hidden, recent. Actions: approve, hide,
+  delete, "seen" (leave as is, out of the queue), ban writer (account forever + network 30
+  days + hides all their posts), lift ban. Stats: today's posts/writers, queue sizes,
+  reports, rejections by reason.
+
+### Tests
+- `bash tests/dayari/run-sql-tests.sh`: a throwaway local Postgres with a small Supabase
+  stand-in (`tests/dayari/supabase-stub.sql`), loads every `sql/` file twice, then checks
+  every policy (`tests/dayari/sql-tests.sql`).
+- `node --test tests/dayari/`: the Edge Function's checks and pipeline with fake
+  Supabase/Turnstile/OpenAI, and the pages in Playwright against a mocked API.
+
 ## Build order / what's left
 
 Done: 1 database, 2 home, 3 posting, 4 archive + day, favorites, hobbies, quotes,
 bookshelf, goals, about, song search, daily weather, favicon, 404. Random day: dropped.
-Left: [places] (still "soon").
+Left: [places] (still "soon"). Dayari Mo: phase A in progress (see above).
 Later, not v1: weight graph, year-in-pixels mood grid, "changed my mind" log, letter to
 future self, RSS, search, places map.
