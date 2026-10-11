@@ -1,5 +1,5 @@
 // Tests for the "dayari" Edge Function, with fake Supabase, Turnstile and OpenAI.
-//   node --test tests/dayari/
+//   node --test "tests/dayari/*.test.mjs"
 // (Node 22+ runs the TypeScript file directly.)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

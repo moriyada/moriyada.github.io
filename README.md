@@ -194,3 +194,71 @@ in `data`:
 
 `media` holds storage paths (like `2026/10/08/x7k2.jpg`) or YouTube links.
 Any field can be left out; the site just skips what isn't there.
+
+## Dayari Mo setup (the anonymous public diary at `/dayari/`)
+
+Dayari Mo has its own tables and pages; nothing here changes the personal diary. Do these
+once, in this order. Everything is free tier. **No secret key ever goes in this repo**: the
+Turnstile secret and the OpenAI key live only in Supabase's Edge Function secrets.
+
+### 1. Database
+Supabase > **SQL Editor** > New query > paste all of [`sql/006_dayari.sql`](sql/006_dayari.sql) > **Run**.
+
+### 2. Sign-up guard (do this BEFORE step 3)
+Supabase > **Authentication** > **Hooks** (may be under Authentication > "Auth Hooks") >
+**Add hook** > **Before User Created** > type **Postgres** > schema `public` > function
+`dayari_before_user_created` > **Create/Enable**.
+This refuses every new account that has an email or phone, so step 3 can't be used to make
+real accounts. Only anonymous ones get through. (If you ever need to add a real user
+yourself, switch this hook off for a minute, add them, switch it back on.)
+
+### 3. Turn on anonymous accounts
+Supabase > **Authentication** > **Sign In / Providers** (or "Providers"/"Settings"):
+1. Turn **on** "Allow new users to sign up" (anonymous sign-in doesn't work without it; the
+   hook from step 2 keeps it safe; your owner rules still only trust `site_owner`).
+2. Turn **on** "Allow anonymous sign-ins". Save.
+3. Leave **Attack Protection > CAPTCHA** OFF. (It would also ask for a captcha on your own
+   login; Dayari Mo checks Turnstile in its Edge Function instead.)
+Optional: Authentication > **Rate Limits** > anonymous sign-ins is 30 per hour per network by
+default. Raise it if a whole school on one wifi starts using it.
+
+### 4. Cloudflare Turnstile (the invisible "are you human" check)
+1. Make a free account at <https://dash.cloudflare.com>, open **Turnstile** > **Add widget**.
+2. Name: `Dayari Mo`. Hostnames: `moriyada.github.io` (add `localhost` too if you test on
+   your computer). Widget mode: **Invisible**. Create.
+3. Copy the **Site Key** into `dayariTurnstileSiteKey` in [`js/config.js`](js/config.js)
+   (it's public, like the anon key). Keep the **Secret Key** for step 6.
+
+### 5. OpenAI moderation key (optional, free)
+<https://platform.openai.com> > **API keys** > **Create new secret key** (if it offers
+"Restricted", allow only the Moderations endpoint). The moderation endpoint costs nothing.
+Skip this and Dayari Mo uses its built-in keyword filter instead (and holds borderline posts
+for your review).
+
+### 6. Edge Function secrets
+Supabase > **Edge Functions** > **Secrets** (or Project Settings > Edge Functions) > add:
+
+| Name | Value |
+| --- | --- |
+| `TURNSTILE_SECRET_KEY` | the Turnstile **Secret Key** from step 4 (required; without it posting stays closed) |
+| `OPENAI_API_KEY` | the key from step 5 (optional) |
+| `DAYARI_IP_SALT` | any long random text, e.g. 40 random letters and numbers from a password generator (recommended) |
+
+Don't add the others you see listed (`SUPABASE_URL` etc.); Supabase provides those itself.
+
+### 7. Deploy the Edge Function
+1. Supabase > **Edge Functions** > **Deploy a new function** > **Via Editor**.
+2. Name it exactly `dayari`.
+3. Delete the sample code, paste ALL of
+   [`supabase/functions/dayari/index.ts`](supabase/functions/dayari/index.ts), click **Deploy**.
+4. Open the function > **Details** (or Settings) > turn **off** "Enforce JWT verification" /
+   "Verify JWT" > Save. The function checks the login itself as its very first step, and this
+   avoids the browser's pre-check being refused.
+5. Whenever a pull request changes that file, paste it again the same way (Code tab > edit >
+   Deploy).
+
+### 8. Try it
+Open `https://moriyada.github.io/dayari/` in a private window: pass the age check, post
+something normal, try a phone number (refused kindly), try "gusto ko nang mamatay" (posted,
+with the hotline note), report a post from a second private window, delete your own post.
+Then log in on your posting page and open `https://moriyada.github.io/admin/`.

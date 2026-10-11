@@ -302,7 +302,7 @@ Claude; wait for his review before starting the next phase.**
 - `bash tests/dayari/run-sql-tests.sh`: a throwaway local Postgres with a small Supabase
   stand-in (`tests/dayari/supabase-stub.sql`), loads every `sql/` file twice, then checks
   every policy (`tests/dayari/sql-tests.sql`).
-- `node --test tests/dayari/`: the Edge Function's checks and pipeline with fake
+- `node --test "tests/dayari/*.test.mjs"`: the Edge Function's checks and pipeline with fake
   Supabase/Turnstile/OpenAI, and the pages in Playwright against a mocked API.
 
 ## Build order / what's left

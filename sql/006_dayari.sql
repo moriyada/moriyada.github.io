@@ -60,6 +60,7 @@ alter table public.dayari_posts add constraint dayari_posts_ok check (
 create index if not exists dayari_posts_public_idx on public.dayari_posts (created_at desc) where status = 'published';
 create index if not exists dayari_posts_author_idx on public.dayari_posts (author_id);
 create index if not exists dayari_posts_review_idx on public.dayari_posts (created_at) where needs_review;
+create index if not exists dayari_posts_iphash_age_idx on public.dayari_posts (created_at) where ip_hash is not null;
 
 -- Reports. One per person per post, and one per network per post, so one person
 -- making 3 throwaway accounts on the same wifi can't hide a post alone.
@@ -541,9 +542,10 @@ stable
 set search_path = ''
 as $$
 begin
-  if coalesce((event -> 'user' ->> 'is_anonymous')::boolean, false)
-     and coalesce(event -> 'user' ->> 'email', '') = ''
-     and coalesce(event -> 'user' ->> 'phone', '') = '' then
+  -- An account with no email and no phone can only be an anonymous one.
+  if coalesce(event -> 'user' ->> 'email', '') = ''
+     and coalesce(event -> 'user' ->> 'phone', '') = ''
+     and coalesce((event -> 'user' ->> 'is_anonymous')::boolean, true) then
     return '{}'::jsonb;
   end if;
   return jsonb_build_object('error', jsonb_build_object(

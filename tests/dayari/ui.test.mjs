@@ -1,5 +1,5 @@
 // Dayari Mo pages in a real browser (Playwright + Chromium), with Supabase and Cloudflare faked.
-//   node --test tests/dayari/
+//   node --test "tests/dayari/*.test.mjs"
 // The /functions/v1/dayari calls go to the REAL Edge Function code (supabase/functions/dayari),
 // wired to a small in-memory database, so page + pipeline are tested together.
 // Skips itself if Playwright isn't installed.

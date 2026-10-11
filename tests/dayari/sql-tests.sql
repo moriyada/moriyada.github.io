@@ -195,6 +195,7 @@ reset role;
 select t.ok(public.dayari_before_user_created('{"user":{"is_anonymous":true,"email":"","phone":""}}') = '{}'::jsonb, 'anonymous sign-ups are allowed');
 select t.ok(public.dayari_before_user_created('{"user":{"is_anonymous":false,"email":"x@y.com","phone":""}}') ? 'error', 'email sign-ups are refused');
 select t.ok(public.dayari_before_user_created('{"user":{"email":"","phone":"+639171234567"}}') ? 'error', 'phone sign-ups are refused');
-select t.ok(public.dayari_before_user_created('{"user":{}}') ? 'error', 'anything unclear is refused');
+select t.ok(public.dayari_before_user_created('{"user":{"email":null,"phone":""}}') = '{}'::jsonb, 'no email and no phone = anonymous, allowed');
+select t.ok(public.dayari_before_user_created('{"user":{"is_anonymous":false,"email":"","phone":""}}') ? 'error', 'marked not-anonymous is refused');
 
 \echo 'ALL DATABASE TESTS PASSED'
