@@ -35,7 +35,13 @@
         el('span', { class: 'chapter-no' }, ['Ch. ' + pad(M.daysBetween(first, r.day) + 1, 4)]),
         ' ',
         el('a', { href: M.dayUrl(r.day) }, [M.formatDate(r.day, { year: undefined })]),
-        el('span', { class: 'note' }, [' · ' + count + (count === 1 ? ' entry' : ' entries')])
+        el('span', { class: 'chapter-extra' }, [
+          el('span', { class: 'note' }, [count + (count === 1 ? ' entry' : ' entries')]),
+          // that day's figure of the day (none before the first one)
+          M.almanacPick && M.almanacPick(r.day)
+            ? el('span', { class: 'figure-tag', title: 'figure of the day' }, [M.figureName(M.almanacPick(r.day))])
+            : null
+        ])
       ]));
     });
   }

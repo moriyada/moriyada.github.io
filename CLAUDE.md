@@ -152,10 +152,18 @@ README.md has the setup steps and the entry field reference; this file has the r
   spread across the centuries, oldest first; changes daily). Under each event, bottom right,
   a small **"source"** link (`<details>`) that opens the list of Wikipedia articles it comes
   from (links, new tab). No buttons or inline summaries there (he found them messy). Shown on the page itself, not as a link out (his
-  ask); a small credit line links the article + CC BY-SA (license requirement). Figure = the
-  `PEOPLE` list (about 280: philosophers, economists, rulers incl. Caesar/Genghis Khan/Mao,
-  Filipino heroes, scientists, writers, chess players...) in a fixed shuffled order, one per
-  Manila day (`M.almanacPick`). One Wikipedia request each per day, cached in
+  ask); a small credit line links the article + CC BY-SA (license requirement).
+  **Who is the figure** (`M.almanacPick(date)`, worked out from the date alone, nothing
+  stored in Supabase): 2026-10-19 = Simone de Beauvoir (`SHOWN`, the first one); from
+  `START` 2026-10-20: first the 15 revolutionaries in `FIRST` (his request: Oct 20 - Nov 3,
+  Bonifacio, Che, Toussaint Louverture, Lenin, Bolivar, Robespierre, Ho Chi Minh, Zapata,
+  Mao, Rosa Luxemburg, Garibaldi, Sankara, Sun Yat-sen, Spartacus, Macario Sakay), then
+  everyone else from `PEOPLE` in a fixed shuffled order. **Never repeats** (283 people:
+  no repeat until 2027-07-30, then it starts over). **Keep the past stable: never edit,
+  reorder or remove `PEOPLE`, `FIRST` or `SHOWN`; add new people only to `MORE`.**
+  The **archive** shows each day's figure name on its chapter row, and the **day page** shows
+  that day's figure card (`M.loadDayFigure`; nothing before 2026-10-19 or for future days).
+  One Wikipedia request each per day on home, cached in
   localStorage until the date changes; if Wikipedia is down the cards say so in a line.
   Wikipedia text is plain text (`explaintext`) shown with textContent only.
 - **Bento grid** (`js/bento.js`), used on home and day pages:
