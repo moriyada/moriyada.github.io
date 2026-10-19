@@ -53,6 +53,9 @@
       message("This page hasn't been written yet.");
       return;
     }
+    // That day's figure of the day (worked out from the date; text from Wikipedia).
+    if (M.loadDayFigure) M.loadDayFigure(date);
+
     if (!M.db) { message('Not connected to the database yet.'); return; }
 
     // Each piece loads on its own (cache -> public -> logged-in), so one slow piece

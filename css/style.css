@@ -786,7 +786,19 @@ ul.chapters {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
 }
-ul.chapters li { padding: 10px 18px; }
+ul.chapters li { display: flex; align-items: baseline; padding: 10px 18px; }
+.chapter-extra { display: flex; flex: 1 1 auto; align-items: baseline; min-width: 0; }
+.chapter-extra .note::before { content: "\00B7  "; margin-left: 5px; }
+/* that day's figure of the day, on the right */
+.figure-tag {
+  margin-left: auto;
+  padding-left: 12px;
+  font-family: var(--font-head);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--muted);
+}
+.day-figure { margin-top: 30px; }
 ul.chapters li + li { border-top: 1px solid var(--line); }
 .chapter-no {
   display: inline-block;
@@ -1011,6 +1023,15 @@ button.song-result img { width: 40px; height: 40px; object-fit: cover; flex: 0 0
   .quote-card blockquote { font-size: 21px; }
   .history > li { grid-template-columns: 64px minmax(0, 1fr); }
   .history .year { font-size: 16px; }
+}
+@media (max-width: 640px) {
+  /* archive rows: "Ch. 0026  Sunday, October 25" / "2 entries · Maximilien Robespierre" */
+  ul.chapters li { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; row-gap: 2px; padding: 10px 14px; }
+  ul.chapters li > .chapter-no { margin-right: 0; }
+  .chapter-extra { grid-column: 2; }
+  .chapter-extra .note::before { content: none; }
+  .figure-tag { margin-left: 0; padding-left: 0; font-size: 14px; }
+  .figure-tag::before { content: "\00B7  "; margin-left: 5px; font-style: normal; }
 }
 @media (max-width: 380px) {
   .hobby-grid { grid-template-columns: 1fr; }

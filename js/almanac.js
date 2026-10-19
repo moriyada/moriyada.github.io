@@ -133,6 +133,36 @@
     ['Herodotus', 'historian'], ['Thucydides', 'historian'], ['Sima Qian', 'historian']
   ];
 
+  // ---------- who is the figure on which day ----------
+  //
+  // Nobody repeats: each Manila day from START takes the next person in ORDER, and ORDER
+  // has every person once. The pick for a date is worked out from the date alone, so the
+  // archive can show any past day's figure without storing anything.
+  //
+  // KEEP THE PAST STABLE: never edit, reorder or remove PEOPLE, FIRST or SHOWN (that would
+  // change who past days had). To add people, put them in MORE (they come after everyone
+  // else). Only when the whole list has been used does it start over from the top.
+
+  // Shown before the schedule began (the figure's first day).
+  var SHOWN = { '2026-10-19': ['Simone de Beauvoir', 'philosopher'] };
+
+  // His request on 2026-10-19: 15 days of revolutionaries first (Oct 20 - Nov 3, 2026),
+  // famous and lesser known, from all over; random after that, like before.
+  var START = '2026-10-20';
+  var FIRST = [
+    ['Andrés Bonifacio', 'Filipino revolutionary'], ['Che Guevara', 'revolutionary'],
+    ['Toussaint Louverture', 'leader of the Haitian Revolution'], ['Vladimir Lenin', 'Russian revolutionary'],
+    ['Simón Bolívar', 'South American liberator'], ['Maximilien Robespierre', 'French revolutionary'],
+    ['Ho Chi Minh', 'Vietnamese revolutionary'], ['Emiliano Zapata', 'Mexican revolutionary'],
+    ['Mao Zedong', 'Chinese revolutionary leader'], ['Rosa Luxemburg', 'revolutionary socialist'],
+    ['Giuseppe Garibaldi', 'Italian revolutionary'], ['Thomas Sankara', 'Burkinabé revolutionary'],
+    ['Sun Yat-sen', 'Chinese revolutionary'], ['Spartacus', 'gladiator and rebel'],
+    ['Macario Sakay', 'Filipino revolutionary']
+  ];
+
+  // Added later go here, at the end (never into PEOPLE).
+  var MORE = [];
+
   // The same shuffled order on every visit: a tiny seeded random number generator.
   function seeded(seed) {
     return function () {
@@ -143,14 +173,27 @@
     };
   }
   var ORDER = (function () {
-    var list = PEOPLE.slice(), rand = seeded(20261019);
-    for (var i = list.length - 1; i > 0; i--) {
+    var used = {};
+    FIRST.forEach(function (p) { used[p[0]] = true; });
+    Object.keys(SHOWN).forEach(function (d) { used[SHOWN[d][0]] = true; });
+    var rest = PEOPLE.filter(function (p) { return !used[p[0]]; });
+    var rand = seeded(20261019);
+    for (var i = rest.length - 1; i > 0; i--) {
       var j = Math.floor(rand() * (i + 1));
-      var x = list[i]; list[i] = list[j]; list[j] = x;
+      var x = rest[i]; rest[i] = rest[j]; rest[j] = x;
     }
-    return list;
+    rest.forEach(function (p) { used[p[0]] = true; });
+    return FIRST.concat(rest, MORE.filter(function (p) { return !used[p[0]]; }));
   })();
-  M.almanacPick = function (day) { return ORDER[((M.dayNumber(day) % ORDER.length) + ORDER.length) % ORDER.length]; };
+
+  // [title, what they were] for a 'YYYY-MM-DD' Manila date, or null before the first figure.
+  M.almanacPick = function (day) {
+    if (SHOWN[day]) return SHOWN[day];
+    if (!day || day < START) return null;
+    return ORDER[(M.dayNumber(day) - M.dayNumber(START)) % ORDER.length];
+  };
+  M.almanacOrder = ORDER;   // for tests
+  M.figureName = function (pick) { return pick ? pick[0].replace(/\s*\(.*\)$/, '') : ''; };
 
   // ---------- reading Wikipedia ----------
 
@@ -314,11 +357,12 @@
     if (head) head.textContent = M.formatDate(day, { weekday: undefined, year: undefined }) + ' in history';
     var cached = M.cache.get(CACHE_KEY);
     var saved = cached && cached.day === day ? cached : { day: day };
-    if (saved.figure && saved.figure.title === pick[0]) showFigure(figBox, saved.figure);
+    if (pick && saved.figure && saved.figure.title === pick[0]) showFigure(figBox, saved.figure);
     if (saved.history) showHistory(hisBox, saved.history);
 
     var jobs = [];
-    if (!(saved.figure && saved.figure.title === pick[0])) {
+    if (!pick) { document.getElementById('figure').hidden = true; }
+    else if (!(saved.figure && saved.figure.title === pick[0])) {
       jobs.push(M.withTimeout(fetchFigure(pick[0]), 12000, 'wikipedia').then(function (f) {
         f.title = pick[0];
         saved.figure = f;
@@ -332,6 +376,18 @@
       }).catch(function () { showHistoryFallback(hisBox); }));
     }
     return Promise.all(jobs).then(function () { if (jobs.length) M.cache.set(CACHE_KEY, saved); });
+  };
+
+  // Day page: the figure that day had (the archive keeps them). Nothing before the first one.
+  M.loadDayFigure = function (day) {
+    var section = document.getElementById('figure');
+    var box = document.getElementById('figure-body');
+    var pick = M.almanacPick(day);
+    if (!section || !box || !pick) return Promise.resolve();
+    section.hidden = false;
+    return M.withTimeout(fetchFigure(pick[0]), 12000, 'wikipedia')
+      .then(function (f) { showFigure(box, f); })
+      .catch(function () { showFigureFallback(box, pick); });
   };
 
   document.addEventListener('DOMContentLoaded', function () {
