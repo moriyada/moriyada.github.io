@@ -1,31 +1,26 @@
 /* Talaarawan (the public, anonymous diary) and its /admin page.
-   Loaded after style.css: same colors, header, ribbon and theme button (the Moriyada
-   identity), but a more modern, readable layer on top: bigger sans-serif text, more
-   spacing, clear rounded buttons, visible focus rings. Mobile first. */
+   Loaded after style.css: same colors, fonts, header, menu and theme button, with a
+   writing-focused layer on top: bigger text, more spacing, big rounded buttons,
+   visible focus rings. Mobile first. */
 
 body.dayari {
-  --dy-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --dy-surface: #f6f6fc;
-  --dy-border: #c9c9e6;
-  --dy-accent: var(--navy);
-  --dy-on-accent: #ffffff;
-  --dy-focus: #1a5fff;
+  --dy-font: var(--font-body);
+  --dy-surface: var(--surface);
+  --dy-border: var(--line);
+  --dy-accent: var(--accent);
+  --dy-on-accent: var(--accent-ink);
+  --dy-focus: var(--accent);
   --dy-danger: #a40000;
-  --dy-ok: #0b6b2e;
+  --dy-ok: var(--ok);
   --dy-warn-bg: #fff7e0;
   --dy-warn-border: #c99a00;
-  --dy-radius: 10px;
+  --dy-radius: var(--radius);
   font-family: var(--dy-font);
   font-size: 18px;
   line-height: 1.6;
 }
 :root[data-theme="dark"] body.dayari {
-  --dy-surface: #161629;
-  --dy-border: #34345c;
-  --dy-on-accent: #0d0d1a;
-  --dy-focus: #8ab4ff;
   --dy-danger: #ff8a8a;
-  --dy-ok: #7fe0a0;
   --dy-warn-bg: #2a2410;
   --dy-warn-border: #b58f22;
 }
@@ -35,7 +30,7 @@ body.dayari #page { max-width: 720px; }
 /* Keep the Moriyada header, a little calmer */
 body.dayari #top h1 { font-size: 40px; }
 body.dayari #top .subtitle { font-size: 17px; color: var(--muted); }
-body.dayari #theme-toggle { width: 44px; height: 40px; border-radius: 8px; }
+body.dayari #theme-toggle { width: 44px; height: 44px; }
 body.dayari #ribbon { font-family: var(--font-body); }
 
 body.dayari h2 {
@@ -101,6 +96,7 @@ body.dayari .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: c
   background: var(--dy-surface);
   border: 1px solid var(--dy-border);
   border-radius: var(--dy-radius);
+  box-shadow: var(--shadow);
   padding: 18px;
   margin: 14px 0;
 }

@@ -15,7 +15,7 @@
     closeBtn = document.createElement('button');
     closeBtn.type = 'button';
     closeBtn.className = 'lightbox-close';
-    closeBtn.textContent = '[x] close';
+    closeBtn.textContent = 'close';
     closeBtn.setAttribute('aria-label', 'close photo');
 
     figure = document.createElement('figure');
@@ -75,6 +75,8 @@
     var pic = btn.querySelector('img');
     if (!pic) return;
     e.preventDefault();
-    open(pic.currentSrc || pic.src, pic.alt, btn.getAttribute('data-caption'));
+    // data-large: a bigger version of the same picture (only set by our own scripts, https only)
+    var large = btn.getAttribute('data-large');
+    open(large && /^https:\/\//.test(large) ? large : (pic.currentSrc || pic.src), pic.alt, btn.getAttribute('data-caption'));
   });
 })();

@@ -1,4 +1,5 @@
-// The menu. Lives here so changing the menu means editing one file, not every page.
+// The menu: rounded links in a bar that stays at the top (it scrolls sideways on phones).
+// Lives here so changing the menu means editing one file, not every page.
 //
 // `ready: true` marks pages that exist. Anything else shows faded with a small "soon" and can't be
 // clicked. When a page gets built, the same change that adds it flips its flag to true here,
@@ -46,5 +47,10 @@
       }
       nav.appendChild(node);
     });
+    // On phones the menu scrolls sideways: start with the current page in view.
+    var cur = nav.querySelector('.current');
+    if (cur && nav.scrollWidth > nav.clientWidth) {
+      nav.scrollLeft = cur.offsetLeft - (nav.clientWidth - cur.offsetWidth) / 2;
+    }
   });
 })();
