@@ -134,7 +134,7 @@ README.md has the setup steps and the entry field reference; this file has the r
   `@font-face` lines and the preload `<link>`s on each page.
 - `[hidden]` always wins (`display: none !important`), so JS can hide anything.
 - Centered column (max 900px), works on phones (16px side padding, things stack below
-  640px, no sideways page scroll; the menu scrolls sideways inside its own bar).
+  640px, no sideways page scroll; the menu bar wraps if it must).
 - Empty states are short lines in the site's voice, e.g. "Nothing yet today. A new page,
   waiting.", "No chapters yet.", "Nothing was written on this day."
 
