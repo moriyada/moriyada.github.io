@@ -116,6 +116,9 @@ README.md has the setup steps and the entry field reference; this file has the r
   header comments on purpose: never edit already-run SQL files (it would only raise "do I
   need to re-run this?"). theme.js still reads the old `moridaya-theme` key as a fallback.
 - Site subtitle is "a public diary & archive" (no name), and subtitles are not italic.
+- **Fewer words, more people and ideas** (his rule, 2026-10-19): keep labels, hints and
+  explanations to the minimum; no "click to read more" for his own entries (a diary is read,
+  not clicked). Prefer a tooltip (`title`) or a small link over a sentence.
 - **Modern, readable, calm** (asked 2026-10-19: "trash the old style", make it more readable
   and engaging; the old-internet look is gone). Warm paper background `--bg #f6f4ef`, white
   cards (`.box`, bento tiles, books, goals, quotes, hobbies, favorites) with a 1px line,
@@ -137,14 +140,18 @@ README.md has the setup steps and the entry field reference; this file has the r
 
 ## Pages
 
-- **Home** (`index.html`): header (title, subtitle, last updated + Manila weather as chips;
-  top right dark-mode button and DAY counter), menu, one-line quote of the day, today's
-  **bento grid**, then NOW and On this day side by side, then the **daily almanac**, footer
-  (visitor counter for the owner, post link). No archive list or hobby list on the home page.
+- **Home** (`index.html`): header (title, subtitle, "updated ..." line; top right dark-mode
+  button and DAY counter), menu bar (on its right: weather "29° partly cloudy", full line on
+  hover, condition hidden on phones; and the **streak**: flame icon (inline SVG, not an
+  emoji) + number of days in a row, hidden at 0), one-line quote of the day, today's **bento
+  grid**, then NOW and On this day side by side, then the **daily almanac**, footer (visitor
+  counter for the owner, post link). No archive list or hobby list on the home page.
 - **Daily almanac** (`js/almanac.js`, home only): "Figure of the day" (photo, name, short
   description, first paragraph + "read more" for up to 4 paragraphs of the article's intro)
-  and "This day in history" (5 of Wikipedia's selected anniversaries for the Manila date,
-  spread across the centuries, oldest first). Shown on the page itself, not as a link out (his
+  and "October 19 in history" (5 of Wikipedia's selected anniversaries for the Manila date,
+  spread across the centuries, oldest first; changes daily). Each event has its articles as
+  small buttons (its sources, up to 3): tapping one opens that article's summary right under
+  the event, with "Source: Wikipedia, '<title>'" linking to it. Shown on the page itself, not as a link out (his
   ask); a small credit line links the article + CC BY-SA (license requirement). Figure = the
   `PEOPLE` list (about 280: philosophers, economists, rulers incl. Caesar/Genghis Khan/Mao,
   Filipino heroes, scientists, writers, chess players...) in a fixed shuffled order, one per
@@ -156,10 +163,9 @@ README.md has the setup steps and the entry field reference; this file has the r
   - Sizes: S 1x1 = song, mood, body; M 2x1 = run, thought,
     food, other; L 2x2 = photo, learned, anything with a picture/video, any text over 280
     characters; XL 4x2 = when the day has exactly one entry.
-  - Home must fit one screen: 3 rows whose height follows the window. Too much: shrink
-    oldest text tiles first (L->M->S), pictures last, then keep the newest and add
-    "+N more from today »" to the day page. Clipped text gets "more »" to `day.html#e-<id>`.
-  - Day page: every entry, rows grow to fit (nothing clipped). Phones: one column.
+  - Home and day page: every entry, shown in full, rows grow to fit. **No "more »" and no
+    "+N more"** (removed 2026-10-19: he doesn't want to click to read his diary; the old
+    one-screen fitting was dropped with it). Phones: one column.
 - **Archive** (`html/archive.html`): every past day with entries, newest first, grouped by
   month, as chapters ("Ch. 0042 Thursday, October 8 · 3 entries"). Chapter number = days
   since the first entry + 1. Today joins at midnight.
@@ -168,9 +174,11 @@ README.md has the setup steps and the entry field reference; this file has the r
 - **Post** (`html/post.html`): login (+ optional 2-step), one form whose fields change by
   type, photo compression to ~300 KB JPEG (song covers ~600px/120 KB), edit/delete recent.
 - **Ribbon** (`js/ribbon.js`): home, archive, favorites, hobbies, bookshelf, quotes, goals,
-  places, about, talaarawan. **No brackets** (he disliked them): lowercase pill links in a
-  bar that sticks to the top while scrolling; the current page is a filled accent pill; on
-  phones the bar scrolls sideways and starts with the current page in view. Pages not built yet have no
+  places, about, talaarawan. **No brackets** (he disliked them). Lowercase pill links in a
+  bar that sticks to the top while scrolling. Only **home, archive, favorites** (+ the
+  current page) show; everything else is in one box behind a **three-line button**, opening
+  on hover (mouse) or tap (phones; closes on outside tap / Esc). On phones the box opens full
+  width under the bar and the bar wraps if needed. Pages not built yet have no
   `ready: true` flag: faded, not clickable, with a tiny "SOON" tag. When you build a page,
   set its flag in the same PR. Only places is still "soon". **Random day was dropped (he doesn't want it); don't build it.**
 - **Favorites** (`html/favorites.html`, tables in `sql/004_favorites.sql`): editable
@@ -250,9 +258,16 @@ Claude; wait for his review before starting the next phase.**
   (owner only). Ribbon item "talaarawan". Scripts:
   `js/dayari.js` (shared: anonymous account, Turnstile, calling the Edge Function, texts),
   `js/dayari-home.js`, `js/dayari-admin.js`. Styles: `css/dayari.css` on top of `style.css`.
-- **Look:** the same design as the rest of the site (colors, fonts, menu, theme button) with
-  a writing-focused layer on top: 18px text, 1.6 line height, 44px+ tap targets, big rounded
-  buttons, visible focus rings, light + dark.
+- **Look (its own, asked 2026-10-19: "should have a different look, attractive to post"):**
+  warm sand + dot-grid background with a terracotta accent (dark: ink + amber), same fonts
+  and menu. The writing box is a **notebook page** (`.dy-page`): today's date in italic
+  serif, an "anonymous" pill, a lined-paper textarea in Fraunces, then the one-time box, a
+  tiny hint, counter and a big Post button. Everyone's posts are **notes on a wall**
+  (`.dy-wall`: grid, newest first, slightly tilted on wide screens, straight on phones).
+  Minimal words: no intro paragraph; rules/privacy are small links (footer + the box).
+- **Age + rules: one checkbox** (`#gate-agree`: "I'm 20 or older and I accept the rules and
+  privacy"), shown until ticked once in this browser; checked when Post is pressed (the
+  writing page shows right away). The Edge Function still gets `ageOk` + `rulesOk`.
 - **All interface text lives in one object (`T` in `js/dayari.js`)** so the Tagalog/English
   toggle (phase E) only has to add a second set.
 

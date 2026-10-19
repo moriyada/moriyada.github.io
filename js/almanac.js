@@ -15,7 +15,7 @@
   var el = function () { return M.el.apply(null, arguments); };
   var API = 'https://en.wikipedia.org/w/api.php';
   var FEED = 'https://en.wikipedia.org/api/rest_v1/feed/onthisday/selected/';
-  var CACHE_KEY = 'almanac-v1';
+  var CACHE_KEY = 'almanac-v2';   // v2: history events carry their articles
 
   // [Wikipedia article title, what they were] - the second part is only shown if Wikipedia
   // can't be reached. Add anyone; the order is reshuffled automatically.
@@ -194,13 +194,36 @@
     });
   }
 
+  // The articles an event links to (its sources), up to 3, each with a short summary so
+  // it can be read right here: title, one-line description, intro text, picture, address.
+  function articles(pages) {
+    return (Array.isArray(pages) ? pages : []).map(function (p) {
+      if (!p || typeof p !== 'object' || !p.extract) return null;
+      var title = (p.titles && p.titles.normalized) || p.normalizedtitle || String(p.title || '').replace(/_/g, ' ');
+      var url = httpsOnly(p.content_urls && p.content_urls.desktop && p.content_urls.desktop.page);
+      if (!title || !url) return null;
+      var text = tidy(p.extract);
+      return {
+        title: tidy(title),
+        desc: p.description ? tidy(p.description) : '',
+        text: text.length > 900 ? text.slice(0, 900).replace(/\s+\S*$/, '') + '...' : text,
+        thumb: httpsOnly(p.thumbnail && p.thumbnail.source),
+        url: url
+      };
+    }).filter(Boolean).slice(0, 3);
+  }
+
   // A handful of events spread across the centuries, oldest first.
   function fetchHistory(day) {
     return getJson(FEED + day.slice(5, 7) + '/' + day.slice(8, 10)).then(function (data) {
       var all = (data && Array.isArray(data.selected) ? data.selected : [])
         .filter(function (e) { return e && typeof e.text === 'string' && typeof e.year === 'number'; })
         .map(function (e) {
-          return { year: e.year, text: tidy(e.text.replace(/\s*\((?:pictured|depicted|shown|illustrated)[^)]*\)/gi, '')) };
+          return {
+            year: e.year,
+            text: tidy(e.text.replace(/\s*\((?:pictured|depicted|shown|illustrated)[^)]*\)/gi, '')),
+            pages: articles(e.pages)
+          };
         })
         .sort(function (a, b) { return a.year - b.year; });
       if (!all.length) throw new Error('no events');
@@ -214,10 +237,8 @@
 
   function credit(url) {
     return el('p', { class: 'almanac-credit' }, [
-      'From ', el('a', { href: url, rel: 'noopener' }, ['Wikipedia']),
-      ', the free encyclopedia. Text under ',
-      el('a', { href: 'https://creativecommons.org/licenses/by-sa/4.0/', rel: 'license noopener' }, ['CC BY-SA 4.0']),
-      '; pictures from Wikimedia Commons.'
+      'Source: ', el('a', { href: url, rel: 'noopener' }, ['Wikipedia']), ' \u00B7 ',
+      el('a', { href: 'https://creativecommons.org/licenses/by-sa/4.0/', rel: 'license noopener' }, ['CC BY-SA 4.0'])
     ]);
   }
 
@@ -266,11 +287,51 @@
 
   function yearText(y) { return y < 0 ? (-y) + ' BC' : String(y); }
 
+  // One event: the year, what happened, and its articles as small buttons. Tapping one opens
+  // its summary right under the event (tap again to close), with the source underneath.
+  function eventItem(e) {
+    var reader = el('div', { class: 'topic-read' });
+    reader.hidden = true;
+    var buttons = [];
+    var openIndex = -1;
+    (e.pages || []).forEach(function (a, i) {
+      var b = el('button', { type: 'button', class: 'topic', 'aria-expanded': 'false' }, [a.title]);
+      b.addEventListener('click', function () {
+        var closing = openIndex === i;
+        openIndex = closing ? -1 : i;
+        buttons.forEach(function (x, j) { x.setAttribute('aria-expanded', String(j === openIndex)); });
+        reader.textContent = '';
+        reader.hidden = closing;
+        if (closing) return;
+        var pic = null;
+        if (a.thumb) {
+          pic = el('img', { src: a.thumb, alt: '', loading: 'lazy', decoding: 'async' });
+          pic.addEventListener('error', function () { pic.hidden = true; });
+        }
+        reader.appendChild(el('div', { class: 'topic-head' }, [
+          pic,
+          el('div', null, [el('h4', null, [a.title]), a.desc ? el('p', { class: 'figure-desc' }, [a.desc]) : null])
+        ]));
+        reader.appendChild(el('p', null, [a.text]));
+        reader.appendChild(el('p', { class: 'almanac-credit' }, [
+          'Source: ', el('a', { href: a.url, rel: 'noopener' }, ['Wikipedia, \u201C' + a.title + '\u201D']), ' (CC BY-SA 4.0)'
+        ]));
+      });
+      buttons.push(b);
+    });
+    return el('li', null, [
+      el('span', { class: 'year' }, [yearText(e.year)]),
+      el('div', null, [
+        el('p', null, [e.text]),
+        buttons.length ? el('div', { class: 'topics' }, buttons) : null,
+        reader
+      ])
+    ]);
+  }
+
   function showHistory(box, events) {
     box.textContent = '';
-    box.appendChild(el('ul', { class: 'history' }, events.map(function (e) {
-      return el('li', null, [el('span', { class: 'year' }, [yearText(e.year)]), el('p', null, [e.text])]);
-    })));
+    box.appendChild(el('ul', { class: 'history' }, events.map(eventItem)));
     box.appendChild(credit('https://en.wikipedia.org/wiki/Wikipedia:Selected_anniversaries'));
   }
 
@@ -284,6 +345,9 @@
     var hisBox = document.getElementById('history-body');
     if (!figBox || !hisBox) return Promise.resolve();
     var pick = M.almanacPick(day);
+    // "October 19 in history": it changes every day, with the date
+    var head = document.querySelector('#history h2');
+    if (head) head.textContent = M.formatDate(day, { weekday: undefined, year: undefined }) + ' in history';
     var cached = M.cache.get(CACHE_KEY);
     var saved = cached && cached.day === day ? cached : { day: day };
     if (saved.figure && saved.figure.title === pick[0]) showFigure(figBox, saved.figure);

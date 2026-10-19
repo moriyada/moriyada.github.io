@@ -30,7 +30,7 @@
     errors: {
       empty: 'Write something first.',
       too_long: 'That\'s a bit long. Keep it under 2,000 characters.',
-      gate: 'Please confirm you\'re 20 or older and agree to the house rules first.',
+      gate: 'Tick the box first: you\'re 20 or older and you accept the rules.',
       captcha: 'We couldn\'t confirm you\'re a person, not a bot. Refresh the page and try again.',
       closed: 'Posting isn\'t open yet. Check back soon.',
       rate: 'That\'s a lot in a short time. Take a breather and try again later.',

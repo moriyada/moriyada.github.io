@@ -153,9 +153,7 @@ async function newPage({ owner = false, mobile = false, dark = false } = {}) {
 }
 
 async function passGate(page) {
-  await page.check('#gate-age');
-  await page.check('#gate-rules');
-  await page.click('#gate-ok');
+  await page.check('#gate-agree');
 }
 
 // ---------- tests ----------
@@ -184,17 +182,20 @@ test('just reading never creates an anonymous account', { skip: !pw }, async () 
   await ctx.close();
 });
 
-test('age gate comes first and needs both boxes', { skip: !pw }, async () => {
-  const { page, ctx } = await newPage();
+test('age + rules box: must be ticked before the first post, then remembered', { skip: !pw }, async () => {
+  const { page, back, ctx } = await newPage();
   await page.goto(base + '/talaarawan/index.html');
+  assert.equal(await page.isVisible('#write-form'), true, 'the page to write on shows right away');
   assert.equal(await page.isVisible('#gate'), true);
-  assert.equal(await page.isVisible('#write-form'), false);
-  await page.check('#gate-age');
-  await page.click('#gate-ok');
-  assert.match(await page.textContent('#gate-msg'), /20 or older/);
-  await page.check('#gate-rules');
-  await page.click('#gate-ok');
-  assert.equal(await page.isVisible('#write-form'), true);
+  await page.fill('#text', 'Unang sulat ko.');
+  await page.click('#post-button');
+  await page.waitForSelector('#write-msg.error');
+  assert.match(await page.textContent('#write-msg'), /20 or older/);
+  assert.equal(back.db.posts.some((p) => p.body === 'Unang sulat ko.'), false, 'nothing sent');
+  await page.check('#gate-agree');
+  await page.click('#post-button');
+  await page.waitForSelector('#write-msg.ok');
+  assert.equal(await page.isVisible('#gate'), false);
   await page.reload();
   assert.equal(await page.isVisible('#gate'), false, 'remembered');
   await ctx.close();
