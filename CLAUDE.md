@@ -140,18 +140,18 @@ README.md has the setup steps and the entry field reference; this file has the r
 
 ## Pages
 
-- **Home** (`index.html`): header (title, subtitle, "updated ..." line; top right dark-mode
-  button and DAY counter), menu bar (on its right: weather "29° partly cloudy", full line on
-  hover, condition hidden on phones; and the **streak**: flame icon (inline SVG, not an
-  emoji) + number of days in a row, hidden at 0), one-line quote of the day, today's **bento
-  grid**, then NOW and On this day side by side, then the **daily almanac**, footer (visitor
+- **Home** (`index.html`): header (title, subtitle, then one line "updated Oct 19, 2026,
+  12:19 PM · Manila: 29°C, partly cloudy, humidity 75%" (he likes the detailed weather; keep
+  it); top right: dark-mode button, the **streak** right of it (flame icon as inline SVG, not
+  an emoji, + number of days in a row; hidden at 0), then the DAY counter), menu, one-line
+  quote of the day, today's **bento grid**, then NOW and On this day side by side, then the **daily almanac**, footer (visitor
   counter for the owner, post link). No archive list or hobby list on the home page.
 - **Daily almanac** (`js/almanac.js`, home only): "Figure of the day" (photo, name, short
   description, first paragraph + "read more" for up to 4 paragraphs of the article's intro)
   and "October 19 in history" (5 of Wikipedia's selected anniversaries for the Manila date,
-  spread across the centuries, oldest first; changes daily). Each event has its articles as
-  small buttons (its sources, up to 3): tapping one opens that article's summary right under
-  the event, with "Source: Wikipedia, '<title>'" linking to it. Shown on the page itself, not as a link out (his
+  spread across the centuries, oldest first; changes daily). Under each event, bottom right,
+  a small **"source"** link (`<details>`) that opens the list of Wikipedia articles it comes
+  from (links, new tab). No buttons or inline summaries there (he found them messy). Shown on the page itself, not as a link out (his
   ask); a small credit line links the article + CC BY-SA (license requirement). Figure = the
   `PEOPLE` list (about 280: philosophers, economists, rulers incl. Caesar/Genghis Khan/Mao,
   Filipino heroes, scientists, writers, chess players...) in a fixed shuffled order, one per
@@ -175,9 +175,10 @@ README.md has the setup steps and the entry field reference; this file has the r
   type, photo compression to ~300 KB JPEG (song covers ~600px/120 KB), edit/delete recent.
 - **Ribbon** (`js/ribbon.js`): home, archive, favorites, hobbies, bookshelf, quotes, goals,
   places, about, talaarawan. **No brackets** (he disliked them). Lowercase pill links in a
-  bar that sticks to the top while scrolling. Only **home, archive, favorites** (+ the
-  current page) show; everything else is in one box behind a **three-line button**, opening
-  on hover (mouse) or tap (phones; closes on outside tap / Esc). On phones the box opens full
+  bar that sticks to the top while scrolling. The **three-line button comes first (left of
+  "home")**, then **home, archive, favorites, talaarawan** (+ the current page); everything
+  else is in one box under the button, opening on hover (mouse) or tap (phones; closes on
+  outside tap / Esc). Nothing else goes in the bar. On phones the box opens full
   width under the bar and the bar wraps if needed. Pages not built yet have no
   `ready: true` flag: faded, not clickable, with a tiny "SOON" tag. When you build a page,
   set its flag in the same PR. Only places is still "soon". **Random day was dropped (he doesn't want it); don't build it.**

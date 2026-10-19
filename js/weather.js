@@ -1,4 +1,4 @@
-// Manila weather from Open-Meteo (free, no key). Shows the current weather in the menu bar.
+// Manila weather from Open-Meteo (free, no key). Shows the current weather in the header, next to "updated ...".
 (function () {
   var M = window.Moriyada = window.Moriyada || {};
 
@@ -66,15 +66,8 @@
     if (!line) return;
     M.fetchWeather().then(function (w) {
       var c = w.current || {};
-      // short on the page ("29° partly cloudy"); the full line shows on hover
-      var cond = document.createElement('span');
-      cond.className = 'cond';
-      cond.textContent = M.weatherText(c.weather_code);
-      line.textContent = Math.round(c.temperature_2m) + '° ';
-      line.appendChild(cond);
-      line.title = 'Manila now: ' + Math.round(c.temperature_2m) + '°C, ' +
+      line.textContent = 'Manila: ' + Math.round(c.temperature_2m) + '°C, ' +
         M.weatherText(c.weather_code) + ', humidity ' + Math.round(c.relative_humidity_2m) + '%';
-      line.setAttribute('aria-label', line.title);
     }).catch(function () {
       line.hidden = true;   // no weather is fine; no need to say so
     });
