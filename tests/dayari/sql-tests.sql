@@ -1,4 +1,4 @@
--- Dayari Mo database policy tests. Run with: bash tests/dayari/run-sql-tests.sh
+-- Talaarawan database policy tests. Run with: bash tests/dayari/run-sql-tests.sh
 -- Each check prints "ok - ..." or stops the run with "FAIL - ...".
 --
 -- People in these tests:

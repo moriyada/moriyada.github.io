@@ -610,31 +610,6 @@ button.zoom[hidden] { display: none; }
   .not-found { text-align: center; }
 }
 
-/* Easter egg on the title (js/ribbon.js): "dayari mo", the name read backward by syllable. */
-#top h1 a { position: relative; }
-#top h1 a[data-egg]::after {
-  content: attr(data-egg);
-  position: absolute;
-  left: 50%;
-  top: 100%;
-  transform: translateX(-50%);
-  padding: 1px 6px;
-  font-family: var(--font-meta);
-  font-size: 11px;
-  font-weight: normal;
-  letter-spacing: 1px;
-  white-space: nowrap;
-  color: var(--muted);
-  background: var(--bg);
-  border: 1px dotted var(--muted);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-}
-#top h1 a[data-egg]:hover::after,
-#top h1 a[data-egg]:focus-visible::after,
-#top h1 a.egg-on::after { opacity: 1; }
-
 /* favorites: owner's [edit] buttons and the manage form title */
 .fav-name .fav-edit { margin-left: 8px; vertical-align: middle; }
 .fav-form-title { margin: 0 0 8px; font-size: 15px; }

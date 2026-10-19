@@ -1,4 +1,4 @@
-// Dayari Mo admin (/admin/): owner only. Review queue, reported/held/crisis posts,
+// Talaarawan admin (/admin/): owner only. Review queue, reported/held/crisis posts,
 // approve/hide/delete, ban a writer, basic stats.
 //
 // Uses the owner's normal login from the posting page. Every call is an owner-only database

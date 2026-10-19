@@ -76,8 +76,6 @@ and log in. Pick a type and the form changes to match. A few things to know:
 
 - **Photos** are shrunk in your browser to about 300 KB before uploading, so
   phone photos are fine. This also removes the hidden location data phones put in photos.
-- **Times** (like fasting start/end) are always read as Manila time, even if
-  your phone is set to another timezone.
 - **Tags** are lowercased, so `Running` and `running` are the same hobby.
 - **Songs**: start typing in "search a song" and pick a result; it fills in the title,
   artist and cover. You can still type everything by hand.
@@ -184,7 +182,7 @@ in `data`:
 | --- | --- |
 | thought | `text` |
 | learned | `topic`, `wikipedia_url`, `own_words`, `voice_note` (storage path, optional), `rabbit_hole` (list of `{title, url}`, optional) |
-| fasting | `start`, `end` (date-times like `2026-10-08T20:00:00+08:00`), `note` |
+| fasting | `start`, `end`, `note` (old entries only: fasting was taken off the form; write it as a thought) |
 | run | `distance_km`, `minutes`, `note` |
 | photo | `caption` (photos themselves go in `media`) |
 | song | `title`, `artist`, `album_art` (image link), `spotify_url` (optional) |
@@ -195,9 +193,9 @@ in `data`:
 `media` holds storage paths (like `2026/10/08/x7k2.jpg`) or YouTube links.
 Any field can be left out; the site just skips what isn't there.
 
-## Dayari Mo setup (the anonymous public diary at `/dayari/`)
+## Talaarawan setup (the anonymous public diary at `/talaarawan/`)
 
-Dayari Mo has its own tables and pages; nothing here changes the personal diary. Do these
+Talaarawan has its own tables and pages; nothing here changes the personal diary. Do these
 once, in this order. Everything is free tier. **No secret key ever goes in this repo**: the
 Turnstile secret and the OpenAI key live only in Supabase's Edge Function secrets.
 
@@ -218,13 +216,13 @@ Supabase > **Authentication** > **Sign In / Providers** (or "Providers"/"Setting
    hook from step 2 keeps it safe; your owner rules still only trust `site_owner`).
 2. Turn **on** "Allow anonymous sign-ins". Save.
 3. Leave **Attack Protection > CAPTCHA** OFF. (It would also ask for a captcha on your own
-   login; Dayari Mo checks Turnstile in its Edge Function instead.)
+   login; Talaarawan checks Turnstile in its Edge Function instead.)
 Optional: Authentication > **Rate Limits** > anonymous sign-ins is 30 per hour per network by
 default. Raise it if a whole school on one wifi starts using it.
 
 ### 4. Cloudflare Turnstile (the invisible "are you human" check)
 1. Make a free account at <https://dash.cloudflare.com>, open **Turnstile** > **Add widget**.
-2. Name: `Dayari Mo`. Hostnames: `moriyada.github.io` (add `localhost` too if you test on
+2. Name: `Talaarawan`. Hostnames: `moriyada.github.io` (add `localhost` too if you test on
    your computer). Widget mode: **Invisible**. Create.
 3. Copy the **Site Key** into `dayariTurnstileSiteKey` in [`js/config.js`](js/config.js)
    (it's public, like the anon key). Keep the **Secret Key** for step 6.
@@ -232,7 +230,7 @@ default. Raise it if a whole school on one wifi starts using it.
 ### 5. OpenAI moderation key (optional, free)
 <https://platform.openai.com> > **API keys** > **Create new secret key** (if it offers
 "Restricted", allow only the Moderations endpoint). The moderation endpoint costs nothing.
-Skip this and Dayari Mo uses its built-in keyword filter instead (and holds borderline posts
+Skip this and Talaarawan uses its built-in keyword filter instead (and holds borderline posts
 for your review).
 
 ### 6. Edge Function secrets
@@ -258,7 +256,7 @@ Don't add the others you see listed (`SUPABASE_URL` etc.); Supabase provides tho
    Deploy).
 
 ### 8. Try it
-Open `https://moriyada.github.io/dayari/` in a private window: pass the age check, post
+Open `https://moriyada.github.io/talaarawan/` in a private window: pass the age check, post
 something normal, try a phone number (refused kindly), try "gusto ko nang mamatay" (posted,
 with the hotline note), report a post from a second private window, delete your own post.
 Then log in on your posting page and open `https://moriyada.github.io/admin/`.

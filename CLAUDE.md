@@ -1,13 +1,14 @@
 # Moriyada: notes for Claude
 
 Moriyada is Deffoh's public diary and life archive: what he did each day (thoughts,
-things learned, fasting, runs, photos, songs...). Anyone can read it. Only he can post.
+things learned, runs, photos, songs...). Anyone can read it. Only he can post.
 
-**The name:** read it backward by syllable. mo-ri-ya-da becomes "da-ya-ri mo", which
-means "your diary" (dayari mo). Hovering or tapping the site title shows "dayari mo" (an
-easter egg in `js/ribbon.js`: CSS `::after` from `data-egg` on hover; on touch screens the
-first tap shows it and the second tap follows the link). The site was called "Moridaya"
-before the GitHub org and repo were renamed to `moriyada/moriyada.github.io`.
+**The name is a hidden word puzzle.** Visitors are meant to work it out themselves ("ohh,
+that's what it means"); Deffoh knows the answer. **Never explain it, hint at it, or put the
+hidden phrase anywhere a visitor can see** (pages, titles, menu, URLs, alt text, meta tags,
+tooltips, the public diary's name). The old hover tooltip on the title was removed for this
+reason (asked 2026-10-19). The site was called "Moridaya" before the GitHub org and repo were
+renamed to `moriyada/moriyada.github.io`.
 README.md has the setup steps and the entry field reference; this file has the rules.
 
 ## Working with Deffoh
@@ -135,7 +136,7 @@ README.md has the setup steps and the entry field reference; this file has the r
   link). No archive list or hobby list on the home page.
 - **Bento grid** (`js/bento.js`), used on home and day pages:
   - 4 columns, `grid-auto-flow: dense`, no visible boxes (spacing + the small label line).
-  - Sizes: S 1x1 = song, mood, body; M 2x1 = run, fasting, thought,
+  - Sizes: S 1x1 = song, mood, body; M 2x1 = run, thought,
     food, other; L 2x2 = photo, learned, anything with a picture/video, any text over 280
     characters; XL 4x2 = when the day has exactly one entry.
   - Home must fit one screen: 3 rows whose height follows the window. Too much: shrink
@@ -213,17 +214,23 @@ README.md has the setup steps and the entry field reference; this file has the r
 - `media` holds storage paths (`YYYY/MM/DD/<random>.jpg`) or YouTube links. Videos are
   YouTube links only (embedded via youtube-nocookie).
 
-## Dayari Mo (the anonymous public diary, `/dayari/`)
+## Talaarawan (the anonymous public diary, `/talaarawan/`)
 
-Asked 2026-10-11: open Moriyada to the public as "Dayari Mo", an anonymous daily diary.
+Built under an older name; renamed **Talaarawan** (Filipino for diary) on 2026-10-19 because the old
+name gave away the site name's puzzle. Behind-the-scenes names stay `dayari` on purpose
+(tables, SQL functions, the `dayari` Edge Function, `js/dayari*.js`, `css/dayari.css`,
+`tests/dayari/`, storage keys): renaming already-run SQL objects isn't worth the risk. Only
+what a visitor sees says Talaarawan.
+
+Asked 2026-10-11: open Moriyada to the public as an anonymous daily diary.
 **The personal diary stays exactly as it is**: separate pages, tables, scripts and styles.
 Built in phases A-F (spec in the project thread), **one PR per phase, never merged by
 Claude; wait for his review before starting the next phase.**
 
 - **Free tier only, no paid services. Public posts are text-only.**
-- **Pages:** `/dayari/index.html` (write + read), `/dayari/privacy.html` (Data Privacy Act
-  notice, plain language), `/dayari/rules.html` (house rules / terms), `/admin/index.html`
-  (owner only). Ribbon item "dayari mo" (no brackets, like every ribbon item). Scripts:
+- **Pages:** `/talaarawan/index.html` (write + read), `/talaarawan/privacy.html` (Data Privacy Act
+  notice, plain language), `/talaarawan/rules.html` (house rules / terms), `/admin/index.html`
+  (owner only). Ribbon item "talaarawan". Scripts:
   `js/dayari.js` (shared: anonymous account, Turnstile, calling the Edge Function, texts),
   `js/dayari-home.js`, `js/dayari-admin.js`. Styles: `css/dayari.css` on top of `style.css`.
 - **Look:** keeps the Moriyada identity (navy, IM Fell English headings, same ribbon and
@@ -255,7 +262,7 @@ Claude; wait for his review before starting the next phase.**
   (provided by Supabase inside functions, never in the repo) to call service-only SQL
   functions: `dayari_gate` (bans + rate limits), `dayari_insert_post`, `dayari_add_report`,
   `dayari_delete_own`, `dayari_log_rejection`.
-- Post pipeline, in order: login check (must be an anonymous account) -> age 13+ and house
+- Post pipeline, in order: login check (must be an anonymous account) -> age 20+ (his rule, was 13) and house
   rules accepted -> length 1-2000 -> Turnstile -> ban + rate limit (per account and per
   network) -> personal info -> crisis words -> moderation -> save.
 - **Rate limits** (sql/006 `dayari_gate`): posts 6/hour and 15/day per account, 20/hour and
@@ -285,7 +292,7 @@ Claude; wait for his review before starting the next phase.**
 - **Reports**: one per account and one per network per post; 3 reports -> hidden + queued.
   Approving clears the reports.
 - **Rejected posts are never stored**; only a reason + day count (`dayari_rejections`).
-- **Turnstile** is the one outside script on the site, loaded only on `/dayari/` pages, only
+- **Turnstile** is the one outside script on the site, loaded only on `/talaarawan/` pages, only
   when someone is about to write/report/delete (CSP adds `https://challenges.cloudflare.com`
   to script-src and frame-src on dayari pages only). No SRI possible (Cloudflare updates it).
   Missing secret on the server = posting closed (fails safe), never "skip the check".
@@ -300,7 +307,7 @@ Claude; wait for his review before starting the next phase.**
 
 ### Setup and deploying
 - His one-time steps (SQL, hook, sign-in switches, Turnstile, secrets, pasting the function in
-  the dashboard editor) are in README "Dayari Mo setup". Any PR that changes
+  the dashboard editor) are in README "Talaarawan setup". Any PR that changes
   `supabase/functions/dayari/index.ts` must tell him to paste and deploy it again.
 - `supabase/` and `tests/` are served by GitHub Pages like everything else: never put
   anything secret there (there isn't any).
@@ -316,6 +323,6 @@ Claude; wait for his review before starting the next phase.**
 
 Done: 1 database, 2 home, 3 posting, 4 archive + day, favorites, hobbies, quotes,
 bookshelf, goals, about, song search, daily weather, favicon, 404. Random day: dropped.
-Left: [places] (still "soon"). Dayari Mo: phase A in a PR, waiting for his review (B-F after).
+Left: [places] (still "soon"). Talaarawan: phase A merged; B-F wait for his go-ahead.
 Later, not v1: weight graph, year-in-pixels mood grid, "changed my mind" log, letter to
 future self, RSS, search, places map.

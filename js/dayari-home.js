@@ -1,4 +1,4 @@
-// Dayari Mo home (/dayari/): the age gate, writing, your own posts (delete), and the public
+// Talaarawan home (/talaarawan/): the age gate, writing, your own posts (delete), and the public
 // feed (report). Every write goes through M.dayari.send (the Edge Function); the page only
 // ever reads published posts directly.
 (function () {
@@ -244,7 +244,7 @@
     var more = $('more');
     if (!M.db) {
       list.textContent = '';
-      list.appendChild(el('li', { class: 'dy-empty' }, ['Dayari Mo isn\'t connected yet.']));
+      list.appendChild(el('li', { class: 'dy-empty' }, ['Talaarawan isn\'t connected yet.']));
       return;
     }
     more.disabled = true;
