@@ -32,19 +32,15 @@
   <header id="top">
     <div id="top-right">
       <button id="theme-toggle" type="button" aria-label="switch theme"></button>
+      <span id="streak" class="streak" hidden><svg class="flame" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12.5 2c.6 3.2-1 5.3-2.6 7.2C8.4 11 7 12.7 7 15.2 7 18.9 9.3 22 12.4 22c3.2 0 5.6-2.7 5.6-6.3 0-2.6-1.3-4.6-2.6-6.1-.1 1.7-.8 3-2 3.6.7-3.9-.1-8.4-.9-11.2z"/><path class="core" d="M12.4 21c-1.6 0-2.8-1.4-2.8-3.3 0-1.6 1-2.7 1.9-3.8.2 1 .8 1.7 1.6 2 .1-.9.5-1.6 1.1-2.2.6 1 .9 2 .9 3.2 0 2.4-1.2 4.1-2.7 4.1z"/></svg><span class="n">0</span></span>
       <div id="day-counter">DAY ----</div>
     </div>
     <h1><a href="index.html">Moriyada</a></h1>
     <p class="subtitle">a public diary &amp; archive</p>
-    <p class="meta" id="last-updated">loading...</p>
+    <p class="meta"><span id="last-updated">loading...</span><span id="weather"></span></p>
   </header>
 
-  <nav id="ribbon">
-    <div id="nav-extra">
-      <span id="weather" class="nav-chip"></span>
-      <span id="streak" class="nav-chip streak" hidden><svg class="flame" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12.5 2c.6 3.2-1 5.3-2.6 7.2C8.4 11 7 12.7 7 15.2 7 18.9 9.3 22 12.4 22c3.2 0 5.6-2.7 5.6-6.3 0-2.6-1.3-4.6-2.6-6.1-.1 1.7-.8 3-2 3.6.7-3.9-.1-8.4-.9-11.2z"/><path class="core" d="M12.4 21c-1.6 0-2.8-1.4-2.8-3.3 0-1.6 1-2.7 1.9-3.8.2 1 .8 1.7 1.6 2 .1-.9.5-1.6 1.1-2.2.6 1 .9 2 .9 3.2 0 2.4-1.2 4.1-2.7 4.1z"/></svg><span class="n">0</span></span>
-    </div>
-  </nav>
+  <nav id="ribbon"></nav>
 
   <div id="notice" class="notice" hidden></div>
 

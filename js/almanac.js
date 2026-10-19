@@ -15,7 +15,7 @@
   var el = function () { return M.el.apply(null, arguments); };
   var API = 'https://en.wikipedia.org/w/api.php';
   var FEED = 'https://en.wikipedia.org/api/rest_v1/feed/onthisday/selected/';
-  var CACHE_KEY = 'almanac-v2';   // v2: history events carry their articles
+  var CACHE_KEY = 'almanac-v3';   // v3: history events carry their source links
 
   // [Wikipedia article title, what they were] - the second part is only shown if Wikipedia
   // can't be reached. Add anyone; the order is reshuffled automatically.
@@ -194,23 +194,14 @@
     });
   }
 
-  // The articles an event links to (its sources), up to 3, each with a short summary so
-  // it can be read right here: title, one-line description, intro text, picture, address.
+  // The Wikipedia articles an event links to: its sources (title + address), up to 4.
   function articles(pages) {
     return (Array.isArray(pages) ? pages : []).map(function (p) {
-      if (!p || typeof p !== 'object' || !p.extract) return null;
+      if (!p || typeof p !== 'object') return null;
       var title = (p.titles && p.titles.normalized) || p.normalizedtitle || String(p.title || '').replace(/_/g, ' ');
       var url = httpsOnly(p.content_urls && p.content_urls.desktop && p.content_urls.desktop.page);
-      if (!title || !url) return null;
-      var text = tidy(p.extract);
-      return {
-        title: tidy(title),
-        desc: p.description ? tidy(p.description) : '',
-        text: text.length > 900 ? text.slice(0, 900).replace(/\s+\S*$/, '') + '...' : text,
-        thumb: httpsOnly(p.thumbnail && p.thumbnail.source),
-        url: url
-      };
-    }).filter(Boolean).slice(0, 3);
+      return title && url ? { title: tidy(title), url: url } : null;
+    }).filter(Boolean).slice(0, 4);
   }
 
   // A handful of events spread across the centuries, oldest first.
@@ -287,45 +278,18 @@
 
   function yearText(y) { return y < 0 ? (-y) + ' BC' : String(y); }
 
-  // One event: the year, what happened, and its articles as small buttons. Tapping one opens
-  // its summary right under the event (tap again to close), with the source underneath.
+  // One event: the year and what happened. Under it, bottom right, a small "source" link
+  // that opens the list of Wikipedia articles it comes from.
   function eventItem(e) {
-    var reader = el('div', { class: 'topic-read' });
-    reader.hidden = true;
-    var buttons = [];
-    var openIndex = -1;
-    (e.pages || []).forEach(function (a, i) {
-      var b = el('button', { type: 'button', class: 'topic', 'aria-expanded': 'false' }, [a.title]);
-      b.addEventListener('click', function () {
-        var closing = openIndex === i;
-        openIndex = closing ? -1 : i;
-        buttons.forEach(function (x, j) { x.setAttribute('aria-expanded', String(j === openIndex)); });
-        reader.textContent = '';
-        reader.hidden = closing;
-        if (closing) return;
-        var pic = null;
-        if (a.thumb) {
-          pic = el('img', { src: a.thumb, alt: '', loading: 'lazy', decoding: 'async' });
-          pic.addEventListener('error', function () { pic.hidden = true; });
-        }
-        reader.appendChild(el('div', { class: 'topic-head' }, [
-          pic,
-          el('div', null, [el('h4', null, [a.title]), a.desc ? el('p', { class: 'figure-desc' }, [a.desc]) : null])
-        ]));
-        reader.appendChild(el('p', null, [a.text]));
-        reader.appendChild(el('p', { class: 'almanac-credit' }, [
-          'Source: ', el('a', { href: a.url, rel: 'noopener' }, ['Wikipedia, \u201C' + a.title + '\u201D']), ' (CC BY-SA 4.0)'
-        ]));
-      });
-      buttons.push(b);
-    });
+    var sources = (e.pages || []).length ? el('details', { class: 'sources' }, [
+      el('summary', null, ['source']),
+      el('ul', null, e.pages.map(function (a) {
+        return el('li', null, [el('a', { href: a.url, target: '_blank', rel: 'noopener' }, [a.title])]);
+      }))
+    ]) : null;
     return el('li', null, [
       el('span', { class: 'year' }, [yearText(e.year)]),
-      el('div', null, [
-        el('p', null, [e.text]),
-        buttons.length ? el('div', { class: 'topics' }, buttons) : null,
-        reader
-      ])
+      el('div', null, [el('p', null, [e.text]), sources])
     ]);
   }
 

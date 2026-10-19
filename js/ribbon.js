@@ -1,6 +1,6 @@
-// The menu. Home, archive and favorites are always showing (plus the page you're on); every
-// other page sits behind the three-line button, in one box that opens on hover (mouse) or
-// tap (phones). Lives here so changing the menu means editing one file, not every page.
+// The menu. The three-line button comes first, then home, archive, favorites and talaarawan
+// (plus the page you're on); every other page sits behind the three-line button, in one box
+// that opens on hover (mouse) or tap (phones). Lives here so changing the menu means editing one file, not every page.
 //
 // `ready: true` marks pages that exist. Anything else shows faded with a small "soon" and can't be
 // clicked. When a page gets built, the same change that adds it flips its flag to true here,
@@ -16,7 +16,7 @@
     { label: 'goals', path: 'html/goals.html', ready: true },
     { label: 'places', path: 'html/places.html' },
     { label: 'about', path: 'html/about.html', ready: true },
-    { label: 'talaarawan', path: 'talaarawan/index.html', ready: true }
+    { label: 'talaarawan', path: 'talaarawan/index.html', ready: true, main: true }
   ];
 
   function node(item, root, current) {
@@ -49,13 +49,6 @@
     if (!nav) return;
     var root = document.body.getAttribute('data-root') || '';
     var current = document.body.getAttribute('data-page');
-    var extra = document.getElementById('nav-extra');   // weather + streak on the home page
-
-    var main = document.createElement('div');
-    main.className = 'nav-main';
-    ITEMS.forEach(function (item) {
-      if (item.main || item.label === current) main.appendChild(node(item, root, current));
-    });
 
     // the three-line button and its box
     var more = document.createElement('div');
@@ -75,8 +68,14 @@
     });
     more.appendChild(btn);
     more.appendChild(box);
-    main.appendChild(more);
-    nav.insertBefore(main, extra || null);
+
+    var main = document.createElement('div');
+    main.className = 'nav-main';
+    main.appendChild(more);   // the three-line button sits left of "home"
+    ITEMS.forEach(function (item) {
+      if (item.main || item.label === current) main.appendChild(node(item, root, current));
+    });
+    nav.appendChild(main);
 
     function setOpen(open) {
       more.classList.toggle('open', open);
