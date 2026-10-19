@@ -86,7 +86,7 @@
 
   var RENDER = {
     last: function (v) {
-      $('last-updated').textContent = v ? M.formatDateTime(v) + ' (Manila)' : 'no posts yet';
+      $('last-updated').textContent = v ? 'updated ' + M.formatDateTime(v) : 'no posts yet';
     },
     dates: function (dates) {
       var real = (dates || []).filter(function (r) { return /^\d{4}-\d{2}-\d{2}$/.test(r.day); });
@@ -94,7 +94,14 @@
         var first = real[real.length - 1].day;   // newest first
         $('day-counter').textContent = 'DAY ' + pad(Math.max(1, M.daysBetween(first, today) + 1));
       }
-      if (state.now) RENDER.now(state.now);    // the streak lives in the NOW box
+      var streak = streakFrom(real);
+      var box = $('streak');
+      if (box) {
+        box.querySelector('.n').textContent = String(streak);
+        box.title = streak + (streak === 1 ? ' day' : ' days') + ' in a row';
+        box.setAttribute('aria-label', box.title);
+        box.hidden = streak < 1;
+      }
     },
     quotes: function (quotes) {
       quotes = (quotes || []).filter(function (q) { return q.text; });
@@ -113,7 +120,6 @@
       var height = firstWith(n.body, 'height_cm');
       var learned = n.learned[0] && n.learned[0].data;
       var goal = (n.goal || [])[0] || null;         // the latest active goal (goals tab)
-      var streak = state.dates ? streakFrom(state.dates) : 0;
 
       var list = [];
       if (reading && reading.title) list.push(['reading', [el('i', null, [reading.title]), reading.author ? ' by ' + reading.author : null]]);
@@ -121,7 +127,6 @@
       if (height) list.push(['height', [height.height_cm + ' cm']]);
       if (learned && learned.topic) list.push(['learning', [M.link(learned.wikipedia_url, learned.topic) || learned.topic]]);
       if (goal && goal.title) list.push(['goal', [el('a', { href: 'html/goals.html' }, [goal.title])]]);
-      if (streak > 0) list.push(['streak', [streak + (streak === 1 ? ' day' : ' days')]]);
       list.forEach(function (row) {
         tbody.appendChild(el('tr', null, [el('th', null, [row[0]]), el('td', null, row[1])]));
       });
@@ -152,12 +157,7 @@
       out.appendChild(ul);
     },
     today: function (entries) {
-      M.renderBento($('bento'), entries, {
-        maxRows: 3,
-        moreHref: M.dayUrl(today),
-        dayHref: function (e) { return M.dayUrl(e.entry_date); },
-        emptyText: 'Nothing yet today. A new page, waiting.'
-      });
+      M.renderBento($('bento'), entries, { emptyText: 'Nothing yet today. A new page, waiting.' });
     }
   };
 

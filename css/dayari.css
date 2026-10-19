@@ -1,9 +1,23 @@
-/* Talaarawan (the public, anonymous diary) and its /admin page.
-   Loaded after style.css: same colors, fonts, header, menu and theme button, with a
-   writing-focused layer on top: bigger text, more spacing, big rounded buttons,
-   visible focus rings. Mobile first. */
+/* Talaarawan (the public, anonymous diary) and its /admin page. Loaded after style.css.
+   Its own look, so it feels like a different room of the same house: warm sand and
+   terracotta (dark: ink and amber), a notebook page to write on, and everyone's pages
+   pinned up like notes on a wall. Mobile first. */
 
 body.dayari {
+  --bg: #f4ede2;
+  --surface: #fffaf2;
+  --surface-2: #efe5d6;
+  --text: #2a2118;
+  --muted: #7a6a58;
+  --line: #e4d6c1;
+  --accent: #c2410c;
+  --accent-ink: #ffffff;
+  --accent-soft: #fbe3d3;
+  --link: #b23c0b;
+  --visited: #8a3a1a;
+  --paper-line: #ecdcc6;
+  --shadow: 0 1px 2px rgba(70, 45, 20, 0.06), 0 8px 22px rgba(70, 45, 20, 0.08);
+
   --dy-font: var(--font-body);
   --dy-surface: var(--surface);
   --dy-border: var(--line);
@@ -11,39 +25,62 @@ body.dayari {
   --dy-on-accent: var(--accent-ink);
   --dy-focus: var(--accent);
   --dy-danger: #a40000;
-  --dy-ok: var(--ok);
-  --dy-warn-bg: #fff7e0;
+  --dy-ok: #2f7a3b;
+  --dy-warn-bg: #fff4d6;
   --dy-warn-border: #c99a00;
-  --dy-radius: var(--radius);
+  --dy-radius: 14px;
+  min-height: 100vh;
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--line) 1px, transparent 1.2px);
+  background-size: 22px 22px;
   font-family: var(--dy-font);
   font-size: 18px;
   line-height: 1.6;
 }
 :root[data-theme="dark"] body.dayari {
+  --bg: #16120e;
+  --surface: #211b15;
+  --surface-2: #2b231b;
+  --text: #f1e7da;
+  --muted: #b3a28d;
+  --line: #3a2f24;
+  --accent: #f59e0b;
+  --accent-ink: #1a1208;
+  --accent-soft: #3a2a14;
+  --link: #fbbf24;
+  --visited: #f2b36b;
+  --paper-line: #342a20;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 22px rgba(0, 0, 0, 0.35);
   --dy-danger: #ff8a8a;
+  --dy-ok: #7fe0a0;
   --dy-warn-bg: #2a2410;
   --dy-warn-border: #b58f22;
 }
+:root[data-theme="dark"]:has(body.dayari) { background: #16120e; }
+html:not([data-theme="dark"]):has(body.dayari) { background: #f4ede2; }
 
-body.dayari #page { max-width: 720px; }
+body.dayari #page { max-width: 760px; }
 
-/* Keep the Moriyada header, a little calmer */
-body.dayari #top h1 { font-size: 40px; }
+body.dayari #top h1 { font-size: 46px; }
 body.dayari #top .subtitle { font-size: 17px; color: var(--muted); }
 body.dayari #theme-toggle { width: 44px; height: 44px; }
 body.dayari #ribbon { font-family: var(--font-body); }
 
 body.dayari h2 {
   font-size: 26px;
-  margin: 28px 0 8px;
+  margin: 34px 0 12px;
   line-height: 1.25;
 }
 body.dayari h3 { font-size: 20px; margin: 18px 0 6px; }
 body.dayari p { margin: 0 0 12px; }
 body.dayari .lead { font-size: 19px; }
-body.dayari .small, body.dayari .hint { font-size: 15px; color: var(--muted); }
-body.dayari footer { font-size: 15px; font-family: var(--dy-font); }
+body.dayari .small, body.dayari .hint { font-size: 14px; color: var(--muted); }
+body.dayari footer { font-size: 14px; font-family: var(--dy-font); }
 body.dayari footer a { margin: 0 8px; }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
 
 /* Focus is always visible, for keyboard users */
 body.dayari a:focus-visible,
@@ -88,6 +125,12 @@ body.dayari button.quiet {
 body.dayari button.quiet:hover { color: var(--dy-accent); border-color: var(--dy-border); }
 body.dayari button:disabled { opacity: 0.55; cursor: wait; }
 body.dayari #theme-toggle { min-height: 0; padding: 0; font-weight: normal; }
+body.dayari .menu-btn {
+  display: flex; flex-direction: column; justify-content: center; align-items: stretch; gap: 4px;
+  width: 38px; height: 34px; min-height: 0; padding: 0 10px;
+  border: 1px solid var(--line); color: var(--text); background: var(--surface);
+}
+body.dayari .nav-more.open .menu-btn, body.dayari .menu-btn:hover { color: var(--accent); border-color: var(--accent); }
 body.dayari .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
 
 /* ---------- panels and forms ---------- */
@@ -103,24 +146,59 @@ body.dayari .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: c
 .dy-panel > :first-child { margin-top: 0; }
 .dy-panel > :last-child { margin-bottom: 0; }
 
+/* the notebook page you write on */
+.dy-page {
+  margin: 4px 0 8px;
+  padding: 18px 22px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 2px 4px rgba(70, 45, 20, 0.06), 0 18px 44px rgba(70, 45, 20, 0.12);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.dy-page:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft), 0 18px 44px rgba(70, 45, 20, 0.12); }
+.dy-page-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+.dy-date { font-family: var(--font-head); font-style: italic; font-size: 21px; }
+.dy-anon {
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 999px;
+}
 body.dayari textarea {
   display: block;
   width: 100%;
   box-sizing: border-box;
-  min-height: 180px;
-  padding: 12px 14px;
-  font-family: var(--dy-font);
-  font-size: 18px;
-  line-height: 1.6;
+  min-height: 224px;
+  padding: 0 2px;
+  font-family: var(--font-head);
+  font-size: 20px;
+  line-height: 32px;
   color: var(--text);
-  background: var(--bg);
-  border: 2px solid var(--dy-border);
-  border-radius: var(--dy-radius);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background-color: transparent;
+  background-image: linear-gradient(transparent 31px, var(--paper-line) 31px);
+  background-size: 100% 32px;
+  background-attachment: local;
+  resize: vertical;
 }
-body.dayari textarea:focus { border-color: var(--dy-accent); }
+body.dayari textarea:focus { outline: none; border: 0; box-shadow: none; }
+body.dayari textarea::placeholder { color: var(--muted); font-style: italic; opacity: 0.8; }
+.dy-page-foot { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.dy-page-foot .hint { flex: 1 1 auto; margin: 0; font-size: 13px; }
+.dy-page .dy-check { font-size: 15px; margin: 12px 0 0; }
+.dy-page .dy-check input { width: 20px; height: 20px; }
+#post-button { min-width: 108px; font-size: 18px; }
+
 body.dayari label.field-label { display: block; font-weight: 600; margin-bottom: 6px; }
 
-.dy-count { font-size: 14px; color: var(--muted); text-align: right; margin-top: 4px; }
+.dy-count { font-size: 13px; color: var(--muted); white-space: nowrap; }
 .dy-count.over { color: var(--dy-danger); font-weight: 600; }
 
 .dy-check {
@@ -164,18 +242,38 @@ body.dayari label.field-label { display: block; font-weight: 600; margin-bottom:
 
 .dy-posts { list-style: none; margin: 0; padding: 0; }
 .dy-post {
-  padding: 16px 0 12px;
-  border-bottom: 1px solid var(--dy-border);
+  margin: 0 0 16px;
+  padding: 16px 18px 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--dy-radius);
+  box-shadow: var(--shadow);
+  break-inside: avoid;
 }
-.dy-post:last-child { border-bottom: 0; }
-.dy-post .when { font-size: 14px; color: var(--muted); margin-bottom: 4px; }
-.dy-post .body { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
-.dy-post .tools { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; }
-.dy-post .yours { font-size: 14px; color: var(--dy-accent); font-weight: 600; }
+.dy-post .when { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.dy-post .body { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; font-family: var(--font-head); font-size: 19px; line-height: 1.55; }
+.dy-post .tools { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }
+.dy-post .tools button.quiet { min-height: 34px; padding: 4px 10px; font-size: 13px; }
+.dy-post .yours { font-size: 13px; color: var(--dy-accent); font-weight: 600; }
 .dy-post .report-form { margin-top: 8px; }
-.dy-post .report-form fieldset { border: 1px solid var(--dy-border); border-radius: var(--dy-radius); padding: 10px 14px; margin: 0; }
+.dy-post .report-form fieldset { border: 1px solid var(--dy-border); border-radius: var(--dy-radius); padding: 10px 14px; margin: 0; font-size: 16px; }
 .dy-post .report-form legend { font-weight: 600; padding: 0 4px; }
 .dy-post .note { font-size: 15px; font-family: var(--dy-font); color: var(--muted); margin-top: 6px; }
+
+/* everyone's pages: notes pinned on a wall, newest first, two across on wide screens,
+   a little crooked */
+.dy-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; align-items: start; }
+.dy-wall .dy-post { margin: 0; }
+.dy-wall .dy-post:nth-child(3n+1) { transform: rotate(-0.5deg); }
+.dy-wall .dy-post:nth-child(3n+2) { transform: rotate(0.4deg); }
+.dy-wall .dy-empty { grid-column: 1 / -1; }
+@media (max-width: 640px) {
+  .dy-wall .dy-post:nth-child(n) { transform: none; }   /* one column: straight, so nothing pokes out sideways */
+  .dy-page { padding: 16px 16px 14px; }
+  .dy-page-foot { flex-wrap: wrap; }
+  .dy-page-foot .hint { flex-basis: 100%; }
+  .dy-page-foot .dy-count { margin-left: auto; }
+}
 
 .dy-badge {
   display: inline-block;
@@ -193,7 +291,7 @@ body.dayari label.field-label { display: block; font-weight: 600; margin-bottom:
 .dy-badge.crisis { border-color: var(--dy-warn-border); background: var(--dy-warn-bg); color: var(--text); }
 .dy-badge.published { border-color: var(--dy-ok); color: var(--dy-ok); }
 
-.dy-empty { color: var(--muted); font-style: italic; }
+.dy-empty { color: var(--muted); font-family: var(--font-head); font-style: italic; font-size: 19px; }
 
 /* ---------- reading pages (privacy, rules) ---------- */
 

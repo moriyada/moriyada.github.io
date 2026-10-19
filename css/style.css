@@ -157,16 +157,8 @@ img { max-width: 100%; height: auto; }
   color: var(--muted);
 }
 
-/* last updated + weather: two small chips */
-#top .meta {
-  display: inline-block;
-  margin: 0 6px 6px 0;
-  padding: 3px 11px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  line-height: 1.6;
-}
+/* "updated Oct 19, 9:10 PM" */
+#top .meta { margin: 0 0 4px; }
 #top .meta:empty { display: none; }
 
 #top-right {
@@ -206,18 +198,21 @@ img { max-width: 100%; height: auto; }
   white-space: nowrap;
 }
 
-/* ---------- menu (js/ribbon.js): pills in a bar that stays at the top ---------- */
+/* ---------- menu (js/ribbon.js) ----------
+   A bar that stays at the top: home, archive, favorites (+ the page you're on) and a
+   three-line button; the other pages open in one box on hover (mouse) or tap (phones).
+   On the home page the right side of the bar has the weather and the streak. */
 
 #ribbon {
   position: sticky;
   top: 0;
   z-index: 20;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 4px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
   margin: 22px -16px 26px;
-  padding: 10px 16px;
+  padding: 9px 16px;
   background: var(--bg);
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
@@ -230,9 +225,10 @@ img { max-width: 100%; height: auto; }
     backdrop-filter: saturate(1.4) blur(10px);
   }
 }
+.nav-main { display: flex; align-items: center; gap: 2px; min-width: 0; }
 #ribbon .item {
   white-space: nowrap;
-  padding: 6px 14px;
+  padding: 6px 13px;
   border-radius: 999px;
   font-weight: 500;
   color: var(--muted);
@@ -252,6 +248,63 @@ img { max-width: 100%; height: auto; }
   text-transform: uppercase;
   vertical-align: 2px;
 }
+
+/* the three-line button */
+.nav-more { position: relative; }
+.menu-btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 38px;
+  height: 34px;
+  margin-left: 4px;
+  padding: 0 10px;
+  border-radius: 999px;
+}
+.menu-btn i { display: block; height: 2px; border-radius: 2px; background: currentColor; }
+.nav-more.open .menu-btn { color: var(--accent); border-color: var(--accent); }
+
+/* the box with the other pages */
+.menu-box {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 30;
+  min-width: 190px;
+  padding: 8px;
+  margin-top: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lift);
+}
+.menu-box::before { content: ""; position: absolute; left: 0; right: 0; top: -10px; height: 10px; }   /* hover bridge */
+.nav-more.open .menu-box { display: grid; }
+@media (hover: hover) and (pointer: fine) {
+  .nav-more:hover .menu-box { display: grid; }
+}
+#ribbon .menu-box .item { display: block; padding: 8px 12px; border-radius: var(--radius-sm); }
+
+/* weather + streak (home) */
+#nav-extra { display: flex; align-items: center; gap: 8px; margin-left: auto; white-space: nowrap; }
+#nav-extra:empty { display: none; }
+.nav-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 11px;
+  font-size: 14px;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.nav-chip:empty { display: none; }
+.streak { font-family: var(--font-mono); font-weight: 600; color: var(--text); }
+.streak .flame { width: 16px; height: 16px; fill: #f97316; }
+.streak .flame .core { fill: #fde047; }
 
 /* ---------- cards ---------- */
 
@@ -388,6 +441,29 @@ img { max-width: 100%; height: auto; }
   white-space: nowrap;
 }
 .history p { margin: 0; font-size: 15.5px; line-height: 1.55; }
+/* an event's articles: small buttons; one opens its summary right under the event */
+.topics { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+button.topic {
+  padding: 2px 10px;
+  font-size: 12.5px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: transparent;
+}
+button.topic[aria-expanded="true"] { color: var(--accent-ink); background: var(--accent); }
+.topic-read {
+  margin-top: 10px;
+  padding: 12px 14px;
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+}
+.topic-read p { font-size: 15px; margin: 0 0 8px; }
+.topic-read .almanac-credit { margin: 0; }
+.topic-head { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+.topic-head img { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; flex: none; }
+.topic-head h4 { margin: 0; font-family: var(--font-head); font-size: 18px; font-weight: 600; }
+.topic-head .figure-desc { margin: 0; font-size: 13.5px; }
 
 /* ---------- entries ---------- */
 
@@ -476,14 +552,12 @@ button.zoom[hidden] { display: none; }
 /* ---------- bento grid (js/bento.js): each entry is a card ---------- */
 
 .bento {
-  --row: 150px;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: minmax(130px, auto);   /* tiles grow to fit: every entry is shown in full */
   grid-auto-flow: dense;
   gap: 16px;
 }
-.bento.fit { grid-auto-rows: var(--row); }                 /* home: fixed rows, fits one screen */
-.bento.full { grid-auto-rows: minmax(150px, auto); }       /* day page: tiles grow to fit everything */
 
 .tile.S  { grid-column: span 1; grid-row: span 1; }
 .tile.M  { grid-column: span 2; grid-row: span 1; }
@@ -528,7 +602,6 @@ button.zoom[hidden] { display: none; }
   max-width: 32em;
 }
 .bento .tile.XL { padding: 22px 26px; }
-.bento.fit .tags { display: none; }   /* tags show on the day page */
 
 /* pictures and video fill the space left in their tile */
 .bento .tile .media {
@@ -549,51 +622,19 @@ button.zoom[hidden] { display: none; }
 }
 .bento .tile .media iframe.video { flex: 1 1 0; height: 100%; aspect-ratio: auto; margin: 0; }
 .bento .tile .media audio { align-self: flex-start; }
-.bento.full .tile .media { min-height: 220px; }
+.bento .tile .media { min-height: 220px; }
 
 .bento .song { gap: 10px; }
 .bento .song img { width: 56px; height: 56px; }
 .bento .song.has-player { display: none; }        /* the player already shows cover and title */
 .bento iframe.spotify { height: 80px; margin: 2px 0 0; }
 
-/* A tile whose text doesn't fit fades out at the bottom and gets "more »" (full text is on
-   the day page). */
-.bento .tile.clipped::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 46px;
-  background: linear-gradient(to bottom, transparent, var(--surface) 75%);
-  pointer-events: none;
-}
-.tile-more {
-  position: absolute;
-  z-index: 1;
-  right: 18px;
-  bottom: 10px;
-  font-size: 13px;
-  font-weight: 600;
-}
-.bento .more-tile {
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  font-size: 15px;
-  font-weight: 600;
-  background: var(--accent-soft);
-  border-color: transparent;
-}
-
 @media (max-width: 640px) {
-  .bento, .bento.fit, .bento.full { grid-template-columns: 1fr; grid-auto-rows: auto; gap: 14px; }
+  .bento { grid-template-columns: 1fr; grid-auto-rows: auto; gap: 14px; }
   .tile.S, .tile.M, .tile.L, .tile.XL { grid-column: auto; grid-row: auto; }
   .bento .tile { overflow: visible; }
   .bento .tile .media { height: 260px; flex: 0 0 auto; }
   .bento .tile.XL p, .bento .tile.XL blockquote { font-size: 21px; }
-  .tile-more { display: none; }
-  .bento .tile.clipped::after { display: none; }
 }
 
 /* ---------- footer ---------- */
@@ -958,16 +999,16 @@ button.song-result img { width: 40px; height: 40px; object-fit: cover; flex: 0 0
   #top { padding: 22px 0 0; text-align: center; }
   #top-right { position: static; justify-content: center; margin: 0 0 14px; }
   #top h1 { font-size: 40px; }
-  #top .meta { margin: 0 3px 6px; }
-  /* the menu scrolls sideways inside its own bar instead of wrapping */
-  #ribbon {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    scrollbar-width: none;
-    margin: 16px -16px 20px;
-  }
-  #ribbon::-webkit-scrollbar { display: none; }
+  /* narrow phones: if it doesn't fit, the menu wraps (weather + streak go to a second line) */
+  #ribbon { margin: 16px -16px 20px; padding: 8px 10px; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .nav-main { flex-wrap: wrap; justify-content: center; }
+  #ribbon .item { padding: 6px 9px; font-size: 14.5px; }
+  #nav-extra { margin-left: 0; }
+  /* the box opens full width under the bar */
+  .nav-more { position: static; }
+  .menu-box { left: 10px; right: 10px; min-width: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .nav-chip { padding: 4px 9px; font-size: 13px; }
+  #weather .cond { display: none; }   /* phones: just the temperature (the rest on tap-and-hold) */
   #below, #almanac { grid-template-columns: 1fr; gap: 14px; }
   .box { padding: 16px 18px 18px; }
   .section-head { text-align: center; }

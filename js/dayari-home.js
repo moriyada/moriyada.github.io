@@ -1,4 +1,4 @@
-// Talaarawan home (/talaarawan/): the age gate, writing, your own posts (delete), and the public
+// Talaarawan home (/talaarawan/): writing (with the one-time age + rules box), your own posts (delete), and the public
 // feed (report). Every write goes through M.dayari.send (the Edge Function); the page only
 // ever reads published posts directly.
 (function () {
@@ -38,28 +38,25 @@
     updateCount();
     text.addEventListener('input', function () { D.draft.set(text.value); updateCount(); });
 
-    // Age gate + house rules, once per browser, before the first post.
-    if (!D.gateAccepted()) {
-      $('gate').hidden = false;
-      form.hidden = true;
-      $('gate-ok').addEventListener('click', function () {
-        if (!$('gate-age').checked || !$('gate-rules').checked) {
-          $('gate-msg').textContent = T.errors.gate;
-          return;
-        }
-        D.acceptGate();
-        $('gate').hidden = true;
-        form.hidden = false;
-        text.focus();
-      });
-    }
+    // Today's date at the top of the page, like a real diary page.
+    function showDate() { $('write-date').textContent = M.formatDate(M.manilaDate(), { year: undefined }); }
+    showDate();
+    setInterval(showDate, 60000);   // rolls over at Manila midnight without reloading the page
 
+    // Age (20+) and the rules: one box, ticked once per browser, before the first post.
+    var gate = $('gate');
+    gate.hidden = D.gateAccepted();
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
       care.textContent = '';
       var value = text.value.trim();
       if (!value) { setMsg(msg, 'error', T.errorTitle, T.errors.empty); text.focus(); return; }
       if (value.length > D.MAX) { setMsg(msg, 'error', T.errorTitle, T.errors.too_long); return; }
+      if (!D.gateAccepted()) {
+        if (!$('gate-agree').checked) { setMsg(msg, 'error', '', T.errors.gate); $('gate-agree').focus(); return; }
+        D.acceptGate();
+        gate.hidden = true;
+      }
 
       button.disabled = true;
       setMsg(msg, '', '', T.checking);

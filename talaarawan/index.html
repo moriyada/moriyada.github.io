@@ -6,9 +6,10 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://*.supabase.co; frame-src https://challenges.cloudflare.com; object-src 'none'; worker-src 'none'; manifest-src 'self'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Talaarawan - Moriyada</title>
-  <meta name="description" content="Talaarawan: an anonymous public diary. Write today, no name, no email.">
+  <meta name="description" content="Talaarawan: a diary for everyone, no names.">
   <link rel="preload" href="../fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../fonts/fraunces-600.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/fraunces-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preconnect" href="https://uxjsqgeynszqhkzzwvhd.supabase.co" crossorigin>
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="icon" href="../favicon.ico" sizes="16x16 32x32 48x48">
@@ -31,34 +32,28 @@
       <button id="theme-toggle" type="button" aria-label="switch theme"></button>
     </div>
     <h1><a href="index.html">Talaarawan</a></h1>
-    <p class="subtitle">an anonymous diary for everyone, on moriyada</p>
+    <p class="subtitle">a diary for everyone, no names</p>
   </header>
 
   <nav id="ribbon" aria-label="Moriyada"></nav>
 
   <main id="content">
-    <p class="lead">Write about your day. No name, no email, no followers, no likes. Just pages.</p>
-    <p class="small">Please read the <a href="rules.html">house rules</a> and the <a href="privacy.html">privacy notice</a>. Text only.</p>
-
-    <section id="write" class="dy-panel" aria-labelledby="write-title">
-      <h2 id="write-title">Write today's entry</h2>
-
-      <!-- shown once, before the first post -->
-      <div id="gate" hidden>
-        <p>Before your first entry:</p>
-        <label class="dy-check"><input type="checkbox" id="gate-age"> <span>I am <strong>20 years old or older</strong>.</span></label>
-        <label class="dy-check"><input type="checkbox" id="gate-rules"> <span>I read and agree to the <a href="rules.html">house rules</a> and the <a href="privacy.html">privacy notice</a>.</span></label>
-        <div class="actions"><button type="button" id="gate-ok" class="primary">Continue</button></div>
-        <p id="gate-msg" class="dy-msg error" role="alert"></p>
-      </div>
-
+    <section id="write" class="dy-page" aria-label="Write today's entry">
       <form id="write-form" novalidate>
-        <label class="field-label" for="text">Your entry</label>
+        <div class="dy-page-head">
+          <span id="write-date" class="dy-date"></span>
+          <span class="dy-anon">anonymous</span>
+        </div>
+        <label class="visually-hidden" for="text">Your entry</label>
         <textarea id="text" name="text" maxlength="2000" aria-describedby="write-hint count" placeholder="Kumusta ang araw mo?"></textarea>
-        <div id="count" class="dy-count" aria-live="polite">0 / 2,000</div>
-        <p id="write-hint" class="hint">Keep it anonymous: no names with schools or workplaces, phone numbers, emails, addresses or social handles.</p>
-        <div class="actions">
-          <button type="submit" id="post-button" class="primary">Post anonymously</button>
+
+        <!-- shown once, before the first post -->
+        <label id="gate" class="dy-check" hidden><input type="checkbox" id="gate-agree"> <span>I'm 20 or older and I accept the <a href="rules.html">rules</a> and <a href="privacy.html">privacy</a>.</span></label>
+
+        <div class="dy-page-foot">
+          <span id="write-hint" class="hint">no names, numbers or addresses</span>
+          <span id="count" class="dy-count" aria-live="polite">0 / 2,000</span>
+          <button type="submit" id="post-button" class="primary">Post</button>
         </div>
         <div id="captcha-box" class="dy-captcha"></div>
         <div id="write-msg" class="dy-msg" role="status" aria-live="polite"></div>
@@ -67,22 +62,21 @@
     </section>
 
     <section id="mine" hidden aria-labelledby="mine-title">
-      <h2 id="mine-title">Your posts</h2>
-      <p class="small">Only you can see this list, on this browser. You can delete any of them anytime.</p>
+      <h2 id="mine-title">Your pages</h2>
+      <p class="hint">Only you see this list, on this browser.</p>
       <ul id="mine-list" class="dy-posts"></ul>
     </section>
 
     <section id="feed" aria-labelledby="feed-title">
-      <h2 id="feed-title">Latest entries</h2>
-      <ul id="feed-list" class="dy-posts" aria-busy="true"><li class="dy-empty">loading...</li></ul>
-      <div class="actions"><button type="button" id="more" class="quiet" hidden>Show older entries</button></div>
+      <h2 id="feed-title">Latest pages</h2>
+      <ul id="feed-list" class="dy-posts dy-wall" aria-busy="true"><li class="dy-empty">loading...</li></ul>
+      <div class="actions"><button type="button" id="more" class="quiet" hidden>Older pages</button></div>
     </section>
   </main>
 
   <footer>
-    <a href="rules.html">house rules</a>
+    <a href="rules.html">rules</a>
     <a href="privacy.html">privacy</a>
-    <a href="../index.html">moriyada</a>
   </footer>
 
 </div>
