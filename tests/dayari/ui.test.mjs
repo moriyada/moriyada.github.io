@@ -1,4 +1,4 @@
-// Dayari Mo pages in a real browser (Playwright + Chromium), with Supabase and Cloudflare faked.
+// Talaarawan pages in a real browser (Playwright + Chromium), with Supabase and Cloudflare faked.
 //   node --test "tests/dayari/*.test.mjs"
 // The /functions/v1/dayari calls go to the REAL Edge Function code (supabase/functions/dayari),
 // wired to a small in-memory database, so page + pipeline are tested together.
@@ -162,7 +162,7 @@ async function passGate(page) {
 
 test('feed shows only published posts, and never any private ID', { skip: !pw }, async () => {
   const { page, errors, ctx } = await newPage();
-  await page.goto(base + '/dayari/index.html');
+  await page.goto(base + '/talaarawan/index.html');
   await page.waitForSelector('#feed-list .dy-post');
   const text = await page.textContent('#feed-list');
   assert.match(text, /Unang araw ko dito/);
@@ -178,7 +178,7 @@ test('just reading never creates an anonymous account', { skip: !pw }, async () 
   const { page, ctx } = await newPage();
   const signups = [];
   page.on('request', (r) => { if (r.url().includes('/auth/v1/signup')) signups.push(r.url()); });
-  await page.goto(base + '/dayari/index.html');
+  await page.goto(base + '/talaarawan/index.html');
   await page.waitForSelector('#feed-list .dy-post');
   assert.equal(signups.length, 0);
   await ctx.close();
@@ -186,12 +186,12 @@ test('just reading never creates an anonymous account', { skip: !pw }, async () 
 
 test('age gate comes first and needs both boxes', { skip: !pw }, async () => {
   const { page, ctx } = await newPage();
-  await page.goto(base + '/dayari/index.html');
+  await page.goto(base + '/talaarawan/index.html');
   assert.equal(await page.isVisible('#gate'), true);
   assert.equal(await page.isVisible('#write-form'), false);
   await page.check('#gate-age');
   await page.click('#gate-ok');
-  assert.match(await page.textContent('#gate-msg'), /13 or older/);
+  assert.match(await page.textContent('#gate-msg'), /20 or older/);
   await page.check('#gate-rules');
   await page.click('#gate-ok');
   assert.equal(await page.isVisible('#write-form'), true);
@@ -202,7 +202,7 @@ test('age gate comes first and needs both boxes', { skip: !pw }, async () => {
 
 test('posting: published, shows in your posts and the feed, can be deleted', { skip: !pw }, async () => {
   const { page, back, errors, ctx } = await newPage();
-  await page.goto(base + '/dayari/index.html');
+  await page.goto(base + '/talaarawan/index.html');
   await passGate(page);
   await page.fill('#text', 'Ang ganda ng araw ko. Nag-kape ako.');
   await page.click('#post-button');
@@ -228,7 +228,7 @@ test('posting: published, shows in your posts and the feed, can be deleted', { s
 
 test('personal info: kind explanation, the text stays so it can be fixed', { skip: !pw }, async () => {
   const { page, back, ctx } = await newPage();
-  await page.goto(base + '/dayari/index.html');
+  await page.goto(base + '/talaarawan/index.html');
   await passGate(page);
   await page.fill('#text', 'Text me 0917 123 4567 ha');
   await page.click('#post-button');
@@ -241,7 +241,7 @@ test('personal info: kind explanation, the text stays so it can be fixed', { ski
 
 test('crisis post: posted normally, gentle hotline note with tap-to-call', { skip: !pw }, async () => {
   const { page, back, ctx } = await newPage();
-  await page.goto(base + '/dayari/index.html');
+  await page.goto(base + '/talaarawan/index.html');
   await passGate(page);
   await page.fill('#text', 'Pagod na ako. Gusto ko nang mamatay.');
   await page.click('#post-button');
@@ -258,7 +258,7 @@ test('crisis post: posted normally, gentle hotline note with tap-to-call', { ski
 
 test('report button: pick a reason, send, thanks', { skip: !pw }, async () => {
   const { page, back, ctx } = await newPage();
-  await page.goto(base + '/dayari/index.html');
+  await page.goto(base + '/talaarawan/index.html');
   await page.click('#feed-list .dy-post button:has-text("Report")');
   await page.check('text=Hate or harassment');
   await page.click('button:has-text("Send report")');
@@ -295,14 +295,14 @@ test('admin: owner sees stats and the queue, and can approve', { skip: !pw }, as
 
 test('phone size, dark mode: readable, no sideways scrolling, big enough buttons', { skip: !pw }, async () => {
   const { page, ctx } = await newPage({ mobile: true, dark: true });
-  for (const p of ['/dayari/index.html', '/dayari/privacy.html', '/dayari/rules.html', '/admin/index.html']) {
+  for (const p of ['/talaarawan/index.html', '/talaarawan/privacy.html', '/talaarawan/rules.html', '/admin/index.html']) {
     await page.goto(base + p);
     await page.waitForLoadState('networkidle');
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     assert.ok(overflow <= 0, p + ' scrolls sideways by ' + overflow + 'px');
     assert.equal(await page.getAttribute('html', 'data-theme'), 'dark');
   }
-  await page.goto(base + '/dayari/index.html');
+  await page.goto(base + '/talaarawan/index.html');
   await passGate(page);
   const h = await page.$eval('#post-button', (b) => b.getBoundingClientRect().height);
   assert.ok(h >= 44, 'post button is ' + h + 'px tall');
@@ -312,11 +312,11 @@ test('phone size, dark mode: readable, no sideways scrolling, big enough buttons
   await ctx.close();
 });
 
-test('the personal diary is untouched, and its ribbon links to dayari mo', { skip: !pw }, async () => {
+test('the personal diary is untouched, and its ribbon links to talaarawan', { skip: !pw }, async () => {
   const { page, ctx } = await newPage();
   await page.goto(base + '/html/about.html');
-  const link = page.locator('#ribbon a', { hasText: 'dayari mo' });
-  assert.equal(await link.getAttribute('href'), '../dayari/index.html');
+  const link = page.locator('#ribbon a', { hasText: 'talaarawan' });
+  assert.equal(await link.getAttribute('href'), '../talaarawan/index.html');
   assert.equal(await page.evaluate(() => document.body.classList.contains('dayari')), false);
   await ctx.close();
 });

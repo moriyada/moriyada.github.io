@@ -1,11 +1,11 @@
 // Bento grid: a day's entries as tiles packed into a grid, instead of a long feed.
 //
 // Tile sizes (columns x rows, on a 4-column grid):
-//   S  1x1  song, quote, mood, body, goal, reading
-//   M  2x1  run, fasting, thought, food, anything else
+//   S  1x1  song, mood, body
+//   M  2x1  run, thought, food, anything else
 //   L  2x2  photo, learned, and any entry with a picture or video
 //   XL 4x2  used when the day has exactly one entry
-// Any entry with long text (over 280 characters) grows to L; long quotes grow to M.
+// Any entry with long text (over 280 characters) grows to L.
 //
 // CSS grid with grid-auto-flow: dense does the packing. On the home page the whole day
 // should fit in one screen (3 rows): if it doesn't, the oldest tiles shrink first
@@ -104,6 +104,7 @@
     Array.prototype.forEach.call(container.querySelectorAll('.tile'), function (tile) {
       var link = tile.querySelector(':scope > .tile-more');
       var clipped = tile.scrollHeight > tile.clientHeight + 4;
+      tile.classList.toggle('clipped', clipped);   // CSS fades the cut-off text out
       if (clipped && !link && tile.getAttribute('data-full')) {
         tile.appendChild(el('a', { class: 'tile-more', href: tile.getAttribute('data-full') }, ['more »']));
       } else if (!clipped && link) {

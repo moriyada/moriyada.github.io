@@ -1,4 +1,4 @@
-// Dayari Mo: shared pieces for the public pages (anonymous account, Turnstile, the Edge
+// Talaarawan: shared pieces for the public pages (anonymous account, Turnstile, the Edge
 // Function, and every bit of interface text).
 //
 // Reading never creates an account. The anonymous account is made only when someone
@@ -11,7 +11,7 @@
 
   D.MAX = 2000;
   D.STORAGE_KEY = 'moriyada-dayari-auth';
-  var GATE_KEY = 'moriyada-dayari-gate';     // age 13+ and house rules accepted (version 1)
+  var GATE_KEY = 'moriyada-dayari-gate-v2';  // age 20+ and house rules accepted (v2: the age went from 13 to 20)
   var DRAFT_KEY = 'moriyada-dayari-draft';
 
   // ---------- all interface text (phase E adds a Tagalog set next to this one) ----------
@@ -30,19 +30,19 @@
     errors: {
       empty: 'Write something first.',
       too_long: 'That\'s a bit long. Keep it under 2,000 characters.',
-      gate: 'Please confirm you\'re 13 or older and agree to the house rules first.',
+      gate: 'Please confirm you\'re 20 or older and agree to the house rules first.',
       captcha: 'We couldn\'t confirm you\'re a person, not a bot. Refresh the page and try again.',
       closed: 'Posting isn\'t open yet. Check back soon.',
       rate: 'That\'s a lot in a short time. Take a breather and try again later.',
-      banned: 'You can\'t post or report on Dayari Mo right now.',
+      banned: 'You can\'t post or report on Talaarawan right now.',
       login: 'Couldn\'t start your anonymous session. Refresh the page and try again.',
-      not_anonymous: 'Dayari Mo only takes anonymous posts. Open this page in a private window to write here.',
+      not_anonymous: 'Talaarawan only takes anonymous posts. Open this page in a private window to write here.',
       moderation: 'We couldn\'t post this. It looks like it may break the house rules (hate, harassment, sexual content or threats). You can still write about hard things, just without attacking anyone.',
       server: 'Something went wrong on our side. Your text is still here, so try again in a bit.',
-      network: 'Couldn\'t reach Dayari Mo. Check your connection; your text is still here.'
+      network: 'Couldn\'t reach Talaarawan. Check your connection; your text is still here.'
     },
     pii: {
-      phone: 'This looks like it has a phone number. To keep you and others safe, Dayari Mo doesn\'t allow phone numbers. Take it out and post again.',
+      phone: 'This looks like it has a phone number. To keep you and others safe, Talaarawan doesn\'t allow phone numbers. Take it out and post again.',
       email: 'This looks like it has an email address. Please take it out so nobody can be traced, then post again.',
       address: 'This looks like it has an address (house number, street, block or lot). Please remove it so nobody can be found, then post again.',
       social: 'This looks like it has a social media link or @username. Please take it out to stay anonymous, then post again.',

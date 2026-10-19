@@ -28,14 +28,6 @@
       ],
       need: [['topic', 'wikipedia_url']]
     },
-    fasting: {
-      fields: [
-        f('start', 'started (Manila time)', 'datetime'),
-        f('end', 'ended (blank if still going)', 'datetime'),
-        f('note', 'note')
-      ],
-      need: ['start']
-    },
     run: {
       fields: [
         f('distance_km', 'distance (km)', 'number', { step: '0.01' }),
@@ -256,9 +248,6 @@
     });
 
     if (type === 'learned' && !data.topic && data.wikipedia_url) data.topic = wikiTitle(data.wikipedia_url);
-    if (type === 'fasting' && data.start && data.end && new Date(data.end) <= new Date(data.start)) {
-      problems.push('the fast has to end after it starts');
-    }
     return { data: data, problems: problems };
   }
 

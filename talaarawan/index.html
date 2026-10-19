@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://*.supabase.co; frame-src https://challenges.cloudflare.com; object-src 'none'; worker-src 'none'; manifest-src 'self'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>Dayari Mo - Moriyada</title>
-  <meta name="description" content="Dayari Mo: an anonymous public diary. Write today, no name, no email.">
-  <link rel="preload" href="../fonts/im-fell-english-400.woff2" as="font" type="font/woff2" crossorigin>
+  <title>Talaarawan - Moriyada</title>
+  <meta name="description" content="Talaarawan: an anonymous public diary. Write today, no name, no email.">
+  <link rel="preload" href="../fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/fraunces-600.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preconnect" href="https://uxjsqgeynszqhkzzwvhd.supabase.co" crossorigin>
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="icon" href="../favicon.ico" sizes="16x16 32x32 48x48">
@@ -22,14 +23,14 @@
   <script defer src="../js/dayari-home.js"></script>
   <script src="../js/theme.js"></script>
 </head>
-<body class="dayari" data-root="../" data-page="dayari mo">
+<body class="dayari" data-root="../" data-page="talaarawan">
 <div id="page">
 
   <header id="top">
     <div id="top-right">
       <button id="theme-toggle" type="button" aria-label="switch theme"></button>
     </div>
-    <h1><a href="index.html">Dayari Mo</a></h1>
+    <h1><a href="index.html">Talaarawan</a></h1>
     <p class="subtitle">an anonymous diary for everyone, on moriyada</p>
   </header>
 
@@ -45,7 +46,7 @@
       <!-- shown once, before the first post -->
       <div id="gate" hidden>
         <p>Before your first entry:</p>
-        <label class="dy-check"><input type="checkbox" id="gate-age"> <span>I am <strong>13 years old or older</strong>.</span></label>
+        <label class="dy-check"><input type="checkbox" id="gate-age"> <span>I am <strong>20 years old or older</strong>.</span></label>
         <label class="dy-check"><input type="checkbox" id="gate-rules"> <span>I read and agree to the <a href="rules.html">house rules</a> and the <a href="privacy.html">privacy notice</a>.</span></label>
         <div class="actions"><button type="button" id="gate-ok" class="primary">Continue</button></div>
         <p id="gate-msg" class="dy-msg error" role="alert"></p>

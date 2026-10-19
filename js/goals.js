@@ -7,14 +7,13 @@
 
   function steps(g) { return Array.isArray(g.steps) ? g.steps.filter(function (s) { return s && s.text; }) : []; }
 
-  // ▰▰▰▱▱  3 of 5 steps
+  // [=====-----]  3 of 5 steps
   function progress(list) {
     if (!list.length) return null;
     var done = list.filter(function (s) { return s.done; }).length;
-    var width = 10, filled = Math.round(done / list.length * width);
-    return el('p', { class: 'goal-progress', 'aria-label': done + ' of ' + list.length + ' steps done' }, [
-      el('span', { class: 'bar', 'aria-hidden': 'true' }, [new Array(filled + 1).join('▰') + new Array(width - filled + 1).join('▱')]),
-      ' ' + done + ' of ' + list.length + ' steps'
+    return el('p', { class: 'goal-progress' }, [
+      el('progress', { max: String(list.length), value: String(done), 'aria-label': done + ' of ' + list.length + ' steps done' }),
+      done + ' of ' + list.length + ' steps'
     ]);
   }
 

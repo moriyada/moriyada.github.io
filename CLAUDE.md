@@ -1,13 +1,14 @@
 # Moriyada: notes for Claude
 
 Moriyada is Deffoh's public diary and life archive: what he did each day (thoughts,
-things learned, fasting, runs, photos, songs...). Anyone can read it. Only he can post.
+things learned, runs, photos, songs...). Anyone can read it. Only he can post.
 
-**The name:** read it backward by syllable. mo-ri-ya-da becomes "da-ya-ri mo", which
-means "your diary" (dayari mo). Hovering or tapping the site title shows "dayari mo" (an
-easter egg in `js/ribbon.js`: CSS `::after` from `data-egg` on hover; on touch screens the
-first tap shows it and the second tap follows the link). The site was called "Moridaya"
-before the GitHub org and repo were renamed to `moriyada/moriyada.github.io`.
+**The name is a hidden word puzzle.** Visitors are meant to work it out themselves ("ohh,
+that's what it means"); Deffoh knows the answer. **Never explain it, hint at it, or put the
+hidden phrase anywhere a visitor can see** (pages, titles, menu, URLs, alt text, meta tags,
+tooltips, the public diary's name). The old hover tooltip on the title was removed for this
+reason (asked 2026-10-19). The site was called "Moridaya" before the GitHub org and repo were
+renamed to `moriyada/moriyada.github.io`.
 README.md has the setup steps and the entry field reference; this file has the rules.
 
 ## Working with Deffoh
@@ -52,9 +53,10 @@ README.md has the setup steps and the entry field reference; this file has the r
 - Never insert user content as HTML. Build DOM with `M.el()` / `textContent`; links only via
   `M.link()` (http/https only). No `innerHTML`, no inline scripts, no inline `style=""`.
 - Every page carries the same Content Security Policy `<meta>` (scripts/styles/fonts only
-  from this site; network only to Supabase, Open-Meteo, iTunes; frames only YouTube-nocookie
-  and Spotify; no workers; upgrade-insecure-requests). If a page needs a new outside host,
-  add it to the CSP on every page and say why.
+  from this site; network only to Supabase, Open-Meteo, iTunes and `en.wikipedia.org` (the
+  home page almanac); frames only YouTube-nocookie and Spotify; no workers;
+  upgrade-insecure-requests). If a page needs a new outside host, add it to the CSP on every
+  page and say why. (The Talaarawan pages have their own, stricter CSP plus Cloudflare.)
 - No third-party scripts. The vendored Supabase library is loaded with Subresource Integrity
   (`integrity="sha384-..."`); if it's ever replaced, update the hash on every page (command in
   `js/vendor/README.md`).
@@ -114,28 +116,44 @@ README.md has the setup steps and the entry field reference; this file has the r
   header comments on purpose: never edit already-run SQL files (it would only raise "do I
   need to re-run this?"). theme.js still reads the old `moridaya-theme` key as a fallback.
 - Site subtitle is "a public diary & archive" (no name), and subtitles are not italic.
-- Old-internet look: white background, navy `#000080` headings and borders, default blue
-  links `#0000ee`, purple visited. No gradients, no emoji, no modern "card" styling.
-  Colors are CSS variables on `:root` with a dark set under `:root[data-theme="dark"]`.
-- Dark mode: one sun/moon button at the top right, saved in localStorage (try/catch).
-- Fonts are four variables: `--font-head`, `--font-body`, `--font-meta`, `--font-mono`.
-  Current pairing is **2. Retro serif** (IM Fell English + Old Standard TT, self-hosted);
-  Verdana for small meta text, Courier New for counters. `html/fonts.html` previews the three
-  options. To switch: change the variables and the font preload `<link>`s on each page.
-- Narrow centered column (max 860px), works on phones (16px side padding, things stack
-  below 640px, no sideways scroll).
+- **Modern, readable, calm** (asked 2026-10-19: "trash the old style", make it more readable
+  and engaging; the old-internet look is gone). Warm paper background `--bg #f6f4ef`, white
+  cards (`.box`, bento tiles, books, goals, quotes, hobbies, favorites) with a 1px line,
+  16px radius and a soft shadow; one indigo accent (`--accent #3446b8`); each entry type has
+  its own label color (`--t-thought`, `--t-run`...). Pill-shaped buttons and menu items.
+  Small motion only (tiles rise in, lift on hover), off under `prefers-reduced-motion`. No
+  emoji. Colors are CSS variables on `:root` with a dark set under `:root[data-theme="dark"]`.
+- Dark mode: one round sun/moon button at the top right, saved in localStorage (try/catch).
+- Fonts: **Fraunces** (headings, quotes, big text) + **Inter** (everything else), self-hosted
+  in `/fonts` (see `fonts/README.md`); `inter-400` and `fraunces-600` are preloaded on every
+  page. Variables: `--font-head`, `--font-body`, `--font-meta`, `--font-mono` (system mono for
+  the day counter / chapter numbers). To switch fonts: change the variables, the
+  `@font-face` lines and the preload `<link>`s on each page.
+- `[hidden]` always wins (`display: none !important`), so JS can hide anything.
+- Centered column (max 900px), works on phones (16px side padding, things stack below
+  640px, no sideways page scroll; the menu scrolls sideways inside its own bar).
 - Empty states are short lines in the site's voice, e.g. "Nothing yet today. A new page,
   waiting.", "No chapters yet.", "Nothing was written on this day."
 
 ## Pages
 
-- **Home** (`index.html`): header (title, subtitle, last updated, Manila weather; top right
-  dark-mode button and DAY counter), ribbon, one-line quote of the day, today's **bento
-  grid**, then NOW and On this day side by side, footer (visitor counter for the owner, post
-  link). No archive list or hobby list on the home page.
+- **Home** (`index.html`): header (title, subtitle, last updated + Manila weather as chips;
+  top right dark-mode button and DAY counter), menu, one-line quote of the day, today's
+  **bento grid**, then NOW and On this day side by side, then the **daily almanac**, footer
+  (visitor counter for the owner, post link). No archive list or hobby list on the home page.
+- **Daily almanac** (`js/almanac.js`, home only): "Figure of the day" (photo, name, short
+  description, first paragraph + "read more" for up to 4 paragraphs of the article's intro)
+  and "This day in history" (5 of Wikipedia's selected anniversaries for the Manila date,
+  spread across the centuries, oldest first). Shown on the page itself, not as a link out (his
+  ask); a small credit line links the article + CC BY-SA (license requirement). Figure = the
+  `PEOPLE` list (about 280: philosophers, economists, rulers incl. Caesar/Genghis Khan/Mao,
+  Filipino heroes, scientists, writers, chess players...) in a fixed shuffled order, one per
+  Manila day (`M.almanacPick`). One Wikipedia request each per day, cached in
+  localStorage until the date changes; if Wikipedia is down the cards say so in a line.
+  Wikipedia text is plain text (`explaintext`) shown with textContent only.
 - **Bento grid** (`js/bento.js`), used on home and day pages:
-  - 4 columns, `grid-auto-flow: dense`, no visible boxes (spacing + the small label line).
-  - Sizes: S 1x1 = song, mood, body; M 2x1 = run, fasting, thought,
+  - 4 columns, `grid-auto-flow: dense`, each entry a card with a colored type label.
+  - Sizes: S 1x1 = song, mood, body; M 2x1 = run, thought,
     food, other; L 2x2 = photo, learned, anything with a picture/video, any text over 280
     characters; XL 4x2 = when the day has exactly one entry.
   - Home must fit one screen: 3 rows whose height follows the window. Too much: shrink
@@ -150,9 +168,9 @@ README.md has the setup steps and the entry field reference; this file has the r
 - **Post** (`html/post.html`): login (+ optional 2-step), one form whose fields change by
   type, photo compression to ~300 KB JPEG (song covers ~600px/120 KB), edit/delete recent.
 - **Ribbon** (`js/ribbon.js`): home, archive, favorites, hobbies, bookshelf, quotes, goals,
-  places, about. **No brackets** (he disliked them): plain lowercase links, widely spaced
-  (flex, 30px gap), no underlines, thin rules above and below; the current page is bold navy
-  with a 2px underline, hover shows a soft underline. Pages not built yet have no
+  places, about, talaarawan. **No brackets** (he disliked them): lowercase pill links in a
+  bar that sticks to the top while scrolling; the current page is a filled accent pill; on
+  phones the bar scrolls sideways and starts with the current page in view. Pages not built yet have no
   `ready: true` flag: faded, not clickable, with a tiny "SOON" tag. When you build a page,
   set its flag in the same PR. Only places is still "soon". **Random day was dropped (he doesn't want it); don't build it.**
 - **Favorites** (`html/favorites.html`, tables in `sql/004_favorites.sql`): editable
@@ -178,11 +196,11 @@ README.md has the setup steps and the entry field reference; this file has the r
   with ctx.owner/edit/save); each page script only describes its form and its own layout:
   - **Bookshelf**: title, author, cover (2:3, 92x138), reading/finished, started/finished,
     thoughts (in a `<details>`). Covers on a shelf grid, "Reading now" then "Finished";
-    no cover = a navy spine with the title.
+    no cover = an accent-colored spine with the title.
   - **Quotes**: the line + who said it, no explanation. Big centered lines, newest first.
   - **Goals**: title, steps (jsonb `[{text, done}]`, a checklist; the owner ticks steps right
     on the page), how I feel right now (+ updated date), status working on it/done/dropped.
-    Text progress bar (▰▱). Sections by status.
+    A `<progress>` bar ("2 of 4 steps"). Sections by status.
   - **Hobbies**: name, photo (square), why I love it, since. Card grid. Tags on daily posts
     are now plain labels (no hobby links).
   - The home NOW box reads "reading" from `books` and "goal" from `goals`; quote of the day
@@ -200,7 +218,7 @@ README.md has the setup steps and the entry field reference; this file has the r
   if it's missing (`upsert ... ignoreDuplicates`). Only the owner writes weather, so
   visitors can't fake it. The day page shows "Manila: high 32°C, light rain". Days he
   doesn't open the posting page get no weather (they have no entries either).
-- **Favicon**: `favicon.svg` (navy square, white serif M) + `favicon.ico`, linked on every
+- **Favicon**: `favicon.svg` (navy square, white serif M; kept) + `favicon.ico`, linked on every
   page. **404**: `404.html`, old-web "Not Found ... Server at ... Port 443" style,
   absolute paths (GitHub Pages serves it for any missing URL).
 
@@ -213,23 +231,28 @@ README.md has the setup steps and the entry field reference; this file has the r
 - `media` holds storage paths (`YYYY/MM/DD/<random>.jpg`) or YouTube links. Videos are
   YouTube links only (embedded via youtube-nocookie).
 
-## Dayari Mo (the anonymous public diary, `/dayari/`)
+## Talaarawan (the anonymous public diary, `/talaarawan/`)
 
-Asked 2026-10-11: open Moriyada to the public as "Dayari Mo", an anonymous daily diary.
+Built under an older name; renamed **Talaarawan** (Filipino for diary) on 2026-10-19 because the old
+name gave away the site name's puzzle. Behind-the-scenes names stay `dayari` on purpose
+(tables, SQL functions, the `dayari` Edge Function, `js/dayari*.js`, `css/dayari.css`,
+`tests/dayari/`, storage keys): renaming already-run SQL objects isn't worth the risk. Only
+what a visitor sees says Talaarawan.
+
+Asked 2026-10-11: open Moriyada to the public as an anonymous daily diary.
 **The personal diary stays exactly as it is**: separate pages, tables, scripts and styles.
 Built in phases A-F (spec in the project thread), **one PR per phase, never merged by
 Claude; wait for his review before starting the next phase.**
 
 - **Free tier only, no paid services. Public posts are text-only.**
-- **Pages:** `/dayari/index.html` (write + read), `/dayari/privacy.html` (Data Privacy Act
-  notice, plain language), `/dayari/rules.html` (house rules / terms), `/admin/index.html`
-  (owner only). Ribbon item "dayari mo" (no brackets, like every ribbon item). Scripts:
+- **Pages:** `/talaarawan/index.html` (write + read), `/talaarawan/privacy.html` (Data Privacy Act
+  notice, plain language), `/talaarawan/rules.html` (house rules / terms), `/admin/index.html`
+  (owner only). Ribbon item "talaarawan". Scripts:
   `js/dayari.js` (shared: anonymous account, Turnstile, calling the Edge Function, texts),
   `js/dayari-home.js`, `js/dayari-admin.js`. Styles: `css/dayari.css` on top of `style.css`.
-- **Look:** keeps the Moriyada identity (navy, IM Fell English headings, same ribbon and
-  theme button) but is more modern and accessible: system sans-serif body at 18px, 1.6 line
-  height, 44px+ tap targets, rounded buttons, visible focus rings, light + dark. The
-  "no modern card styling" rule is for the personal diary only.
+- **Look:** the same design as the rest of the site (colors, fonts, menu, theme button) with
+  a writing-focused layer on top: 18px text, 1.6 line height, 44px+ tap targets, big rounded
+  buttons, visible focus rings, light + dark.
 - **All interface text lives in one object (`T` in `js/dayari.js`)** so the Tagalog/English
   toggle (phase E) only has to add a second set.
 
@@ -255,7 +278,7 @@ Claude; wait for his review before starting the next phase.**
   (provided by Supabase inside functions, never in the repo) to call service-only SQL
   functions: `dayari_gate` (bans + rate limits), `dayari_insert_post`, `dayari_add_report`,
   `dayari_delete_own`, `dayari_log_rejection`.
-- Post pipeline, in order: login check (must be an anonymous account) -> age 13+ and house
+- Post pipeline, in order: login check (must be an anonymous account) -> age 20+ (his rule, was 13) and house
   rules accepted -> length 1-2000 -> Turnstile -> ban + rate limit (per account and per
   network) -> personal info -> crisis words -> moderation -> save.
 - **Rate limits** (sql/006 `dayari_gate`): posts 6/hour and 15/day per account, 20/hour and
@@ -285,7 +308,7 @@ Claude; wait for his review before starting the next phase.**
 - **Reports**: one per account and one per network per post; 3 reports -> hidden + queued.
   Approving clears the reports.
 - **Rejected posts are never stored**; only a reason + day count (`dayari_rejections`).
-- **Turnstile** is the one outside script on the site, loaded only on `/dayari/` pages, only
+- **Turnstile** is the one outside script on the site, loaded only on `/talaarawan/` pages, only
   when someone is about to write/report/delete (CSP adds `https://challenges.cloudflare.com`
   to script-src and frame-src on dayari pages only). No SRI possible (Cloudflare updates it).
   Missing secret on the server = posting closed (fails safe), never "skip the check".
@@ -300,7 +323,7 @@ Claude; wait for his review before starting the next phase.**
 
 ### Setup and deploying
 - His one-time steps (SQL, hook, sign-in switches, Turnstile, secrets, pasting the function in
-  the dashboard editor) are in README "Dayari Mo setup". Any PR that changes
+  the dashboard editor) are in README "Talaarawan setup". Any PR that changes
   `supabase/functions/dayari/index.ts` must tell him to paste and deploy it again.
 - `supabase/` and `tests/` are served by GitHub Pages like everything else: never put
   anything secret there (there isn't any).
@@ -314,8 +337,8 @@ Claude; wait for his review before starting the next phase.**
 
 ## Build order / what's left
 
-Done: 1 database, 2 home, 3 posting, 4 archive + day, favorites, hobbies, quotes,
+Done: 1 database, 2 home, 3 posting, 4 archive + day, favorites, hobbies, quotes, redesign + daily almanac,
 bookshelf, goals, about, song search, daily weather, favicon, 404. Random day: dropped.
-Left: [places] (still "soon"). Dayari Mo: phase A in a PR, waiting for his review (B-F after).
+Left: [places] (still "soon"). Talaarawan: phase A merged; B-F wait for his go-ahead.
 Later, not v1: weight graph, year-in-pixels mood grid, "changed my mind" log, letter to
 future self, RSS, search, places map.

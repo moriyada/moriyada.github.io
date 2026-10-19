@@ -1,4 +1,4 @@
-// Dayari Mo: the one door for every public write (post, report, delete).
+// Talaarawan: the one door for every public write (post, report, delete).
 //
 // Deployed as the Supabase Edge Function "dayari". One file, no imports, so it can be pasted
 // straight into the Supabase dashboard editor. The website calls it at
@@ -14,7 +14,7 @@
 // Provided by Supabase automatically: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY.
 //
 // Post pipeline, in order:
-//   1. must be an anonymous account; age 13+ and house rules accepted; 1-2000 characters
+//   1. must be an anonymous account; age 20+ and house rules accepted; 1-2000 characters
 //   2. Cloudflare Turnstile (invisible captcha)
 //   3. bans + rate limits (per account and per network), in the database
 //   4. personal info (phone, email, address, social handles, full name + school/work): refused
@@ -136,7 +136,7 @@ const NOT_NAMES = new Set((
   'manila maynila quezon city cebu davao makati taguig pasig marikina tarlac pampanga bulacan cavite laguna ' +
   'batangas rizal baguio iloilo bacolod cagayan philippines pilipinas luzon visayas mindanao metro ncr ' +
   'university college school academy institute high elementary national state senior junior grade section ' +
-  'english filipino tagalog math science dayari moriyada facebook instagram tiktok youtube netflix spotify ' +
+  'english filipino tagalog math science talaarawanriyada facebook instagram tiktok youtube netflix spotify ' +
   'google chatgpt jollibee mcdo starbucks shopee lazada gcash'
 ).split(/\s+/));
 
