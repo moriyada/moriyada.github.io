@@ -1,0 +1,10 @@
+{
+  "name": "moriyada-archive-builder",
+  "private": true,
+  "description": "Builds the site + the public archive for GitHub Pages (runs only in GitHub Actions, never on the site).",
+  "type": "module",
+  "engines": { "node": ">=20.9" },
+  "dependencies": {
+    "sharp": "0.35.4"
+  }
+}

@@ -1,7 +1,5 @@
 # Moriyada
 
-*Read it backward by syllable: mo-ri-ya-da → da-ya-ri mo, "your diary."*
-
 A public diary and life archive of Deffoh. Anyone can read it. Only Deffoh can post.
 
 Plain HTML, CSS and JavaScript (no build step), hosted on GitHub Pages, with
@@ -65,9 +63,42 @@ The anon key is meant to be public. It can only do what the database rules
 allow, which is reading non-private entries. **Never** put the
 `service_role` key anywhere in this repo: that one skips all the rules.
 
-### 5. Turn on GitHub Pages
+### 5. Turn on GitHub Pages (published by GitHub Actions)
 
-Repo **Settings > Pages**: source "Deploy from a branch", branch `main`, folder `/ (root)`.
+The site is published by the workflow `.github/workflows/pages.yml`, which also builds the
+backup archive (see "Archive" below).
+
+1. Repo **Settings > Secrets and variables > Actions > New repository secret**, add two:
+   - `SUPABASE_URL`: the Project URL (same as in `js/config.js`)
+   - `SUPABASE_ANON_KEY`: the **anon / publishable** key (same as in `js/config.js`).
+     Never the `service_role` / secret key; the build stops if it gets one.
+2. Repo **Settings > Pages > Build and deployment > Source**: choose **GitHub Actions**.
+3. **Actions** tab > **Publish site + archive** > **Run workflow** (or just push to `main`).
+
+## Archive (backup copy)
+
+So the diary stays readable even if Supabase is paused or deleted, or nobody touches the
+repo for years:
+
+- **Every push to `main`, every day at 3:23 AM Manila, and by hand** (Actions > Publish
+  site + archive > Run workflow), GitHub Actions reads every **public** entry (plus books,
+  quotes, goals, hobbies, favorites, saved weather) with the anon key and publishes them
+  with the site under `/archive/`: `archive/<year>.json`, `archive/tabs.json`,
+  `archive/meta.json` (date + count) and `archive/media/` (photos, re-encoded to about
+  300 KB at most with **all EXIF/GPS removed**). Built by `tools/archive/build.mjs`.
+- Private entries never get in (filtered in the query and checked again), and neither do
+  their photos. The archive is rebuilt from scratch each run, so deleted or newly private
+  entries disappear from it on the next run. It is **never committed** to the repo (it only
+  exists in the published site), so no old copies stay in git history.
+- If Supabase can't be read during a run (paused, down, wrong key, or suddenly 0 entries),
+  the archive that is live right now is published again instead of an empty one.
+- **On the site:** if Supabase doesn't answer within 5 seconds (or is down), pages switch
+  to **archive mode**: everything reads from `/archive/`, a small "archive mode · last saved
+  <date>" note shows, and posting/login/editing are switched off.
+  To test it any time: add `?archive=1` to a page address (it stays on in that tab;
+  `?archive=0` turns it off), e.g. `https://moriyada.github.io/?archive=1`.
+- If the repo is left alone, GitHub pauses scheduled workflows after about 60 days without
+  activity. Then the archive simply stops updating; the last published one stays online.
 
 ## Posting
 

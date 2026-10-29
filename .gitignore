@@ -1,0 +1,5 @@
+# Built by GitHub Actions only (tools/archive/build.mjs). The archive and its photos must
+# never be committed: they live only in the published Pages artifact.
+/_site/
+/archive/
+node_modules/
