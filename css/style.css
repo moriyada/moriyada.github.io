@@ -1036,3 +1036,27 @@ button.song-result img { width: 40px; height: 40px; object-fit: cover; flex: 0 0
 @media (max-width: 380px) {
   .hobby-grid { grid-template-columns: 1fr; }
 }
+
+/* ---------- archive mode (js/offline.js): Supabase unreachable, reading /archive/ ---------- */
+
+/* "archive mode · last saved Oct 29, 2026": small, old-web style */
+.archive-note {
+  margin: 12px 0 0;
+  padding: 3px 10px;
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  border: 1px dashed var(--muted);
+  border-radius: 4px;
+}
+/* read-only: no posting, no login, no manage boxes, no owner extras */
+html.archive-mode a[href$="post.html"],
+html.archive-mode #manager,
+html.archive-mode #fav-manager,
+html.archive-mode #visitor-line,
+html.archive-mode body.dayari #write,
+html.archive-mode body.dayari #mine { display: none !important; }
+html.archive-mode body[data-page="post"] #page > :not(#top):not(#ribbon):not(#archive-note):not(#archive-off):not(footer),
+html.archive-mode body[data-page="admin"] #page > :not(#top):not(#ribbon):not(#archive-note):not(#archive-off):not(footer) { display: none !important; }

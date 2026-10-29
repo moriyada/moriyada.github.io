@@ -27,8 +27,11 @@ README.md has the setup steps and the entry field reference; this file has the r
 ## Stack and layout
 
 - Plain HTML, CSS, JavaScript. No framework, no build step, no npm at runtime.
-- GitHub Pages from `main` (repo `moriyada/moriyada.github.io`). Supabase (free tier) for
-  database, storage (bucket `media`) and login.
+- GitHub Pages (repo `moriyada/moriyada.github.io`), **published by GitHub Actions**
+  (`.github/workflows/pages.yml`, Pages source = "GitHub Actions"): on every push to `main`,
+  daily at 3:23 AM Manila, and by hand. Supabase (free tier) for database, storage (bucket
+  `media`) and login. The only build-time tool is `tools/archive/` (Node + sharp, pinned
+  in its lock file); the site itself still has no build step and no npm at runtime.
 - Folders by language: `/index.html`, `/html/` (other pages), `/css/style.css`, `/js/` (one
   file per feature), `/sql/setup.sql` (whole database; idempotent, safe to re-run), `404.html`.
 - JS: classic scripts (not modules), ES5-style `var`/`function` plus async/await where it
@@ -69,7 +72,11 @@ README.md has the setup steps and the entry field reference; this file has the r
 - Errors: every page part ends in data or a short message; unhandled errors are logged
   quietly (`js/db.js` safety nets), and leftover "loading..." text is replaced after 20 s.
 - Keep-alive: `.github/workflows/keep-alive.yml` pings Supabase every 3 days with the public
-  anon key read from `js/config.js` (no secrets, no third-party actions).
+  anon key read from `js/config.js` (no secrets, no third-party actions). GitHub disables
+  scheduled workflows after ~60 days without repo activity; the last archive stays live.
+- **Archive** (see "Archive and archive mode" below): only public rows, photos re-encoded
+  with no EXIF/GPS, never committed to git (`.gitignore` has `/archive/` and `/_site/`),
+  anon key only (the build refuses service_role / `sb_secret_` keys).
 - Secrets audit (all files + full git history): only the anon key was ever committed. His
   email appears only in commit author info from GitHub-website commits (fix: GitHub >
   Settings > Emails > "Keep my email addresses private").
@@ -238,6 +245,47 @@ README.md has the setup steps and the entry field reference; this file has the r
 - **Favicon**: `favicon.svg` (navy square, white serif M; kept) + `favicon.ico`, linked on every
   page. **404**: `404.html`, old-web "Not Found ... Server at ... Port 443" style,
   absolute paths (GitHub Pages serves it for any missing URL).
+
+## Archive and archive mode (asked 2026-10-29)
+
+Goal: the diary stays readable for years even if Supabase pauses or is deleted and even if
+nobody opens GitHub again. Posting is unchanged (straight to Supabase).
+
+- **Build** (`tools/archive/build.mjs`, run by `pages.yml`): copies the site (git-tracked
+  files minus dot-files, `tools/` and root `*.md`) into `_site/`, then reads with the anon
+  key (`SUPABASE_URL` / `SUPABASE_ANON_KEY` Actions secrets): `entries` with
+  `private=eq.false` (and filters `private === false` again), plus `books, quotes, goals,
+  hobbies, favorite_categories, favorites, day_weather` (only the columns the site reads).
+  Writes `archive/<year>.json` ({year, entries}), `archive/tabs.json`, `archive/meta.json`
+  ({saved_at, saved_day, entries, years, counts, media: [paths], source}). Photos (entry
+  media, book covers, hobby + favorite photos; storage paths only) go to
+  `archive/media/<same path>`, re-encoded by sharp (max 1600px, <= ~300 KB, metadata
+  never written; checked after). Voice notes are not archived.
+- **Reuse:** photos already in the live archive (`LIVE_URL/archive/meta.json` media list)
+  are copied from the live site, so each photo is read from Supabase once (free-tier
+  bandwidth).
+- **Never publish an empty archive:** if Supabase can't be read, secrets are missing, or it
+  returns 0 entries while the live archive has some, the live archive is published again
+  (meta `source: "previous archive"`). Warns (`::warning::`) at 750 MB (Pages limit 1 GB).
+- **Site** (`js/offline.js`, loaded right after `db.js` on every page that uses the
+  database): wraps `M.db` in a recorder of query calls. Each query runs on Supabase with a
+  5 s limit until Supabase has answered once; no connection / timeout / HTTP 5xx (paused)
+  switches the page to **archive mode** (`M.archiveMode`, `html.archive-mode`), and that
+  query and all later ones are answered from `/archive/` by a small in-browser stand-in
+  (from/rpc, select, eq/neq/lt/lte/gt/gte/in/is/contains, order (nulls like Postgres),
+  limit/range, maybeSingle/single; rpc `entry_dates`, `on_this_day`, `tag_counts`;
+  `is_owner`/`get_visits`/`bump_visits` -> null; writes refused). A normal query error from
+  a working database never switches. `M.mediaUrl` points to `archive/media/` (and returns
+  '' for anything not archived). `M.hasStoredSession()` / `M.ownerClient()` are off in
+  archive mode, so no owner extras or manage boxes.
+- **Read-only UI:** note "archive mode · last saved Oct 29, 2026" (`#archive-note`, small
+  dashed monospace, top of the page); post links, manage boxes, visitor line and the
+  Talaarawan writing box hidden; post/admin pages show "Posting is off while the site runs
+  from its archive." `?archive=1` forces archive mode (kept for the tab via
+  sessionStorage), `?archive=0` turns it off.
+- When adding a page or a query: make sure the archive has its table (add it to `TABS` in
+  build.mjs with the columns the page selects) and that `js/offline.js` supports the query
+  methods used.
 
 ## Data
 

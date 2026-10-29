@@ -1,0 +1,78 @@
+# Publishes the website AND a fresh public archive of the diary to GitHub Pages.
+#
+# Runs on every push to main, once a day, and by hand (Actions > Publish site + archive >
+# Run workflow). Each run:
+#   1. copies the site's files
+#   2. reads every PUBLIC entry (plus books, quotes, goals, hobbies, favorites, weather) from
+#      Supabase with the public anon key, and saves them under /archive/ with cleaned photos
+#      (no EXIF/GPS), so the site can still be read if Supabase is ever paused or gone
+#   3. deploys it all to GitHub Pages
+# If Supabase can't be read, the archive that is live right now is published again instead
+# of an empty one. The archive is never committed to the repo: it only exists in the
+# deployed site, rebuilt from scratch each run (deleted or private entries drop out).
+#
+# Needs: Settings > Pages > Source = "GitHub Actions", and two repository secrets:
+#   SUPABASE_URL       the Project URL  (https://xxxx.supabase.co)
+#   SUPABASE_ANON_KEY  the anon / publishable key (NEVER the service_role / secret key;
+#                      the build stops if it gets one)
+name: Publish site + archive
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 19 * * *'   # every day at 19:23 UTC = 3:23 AM Manila (after the day is over)
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+# One deploy at a time; a newer run waits instead of cancelling one that is publishing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Get the site's files
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install the photo cleaner (exact versions from the lock file)
+        run: npm ci --prefix tools/archive --no-audit --no-fund
+
+      - name: Build the site + archive
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          LIVE_URL: https://moriyada.github.io
+        run: node tools/archive/build.mjs _site
+
+      - name: Package it for Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

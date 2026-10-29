@@ -204,6 +204,7 @@
       }
     }).catch(function (err) {
       if (window.console) console.warn('owner view', err);
+      if (M.archiveMode) return;   // Supabase is down and the archive is showing; nothing to log in to
       notice("Couldn't check your login in time, so only public entries are shown. " +
         'Refresh, or log in again on the post page.');
     });
